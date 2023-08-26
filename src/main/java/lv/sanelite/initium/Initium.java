@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Initium.MOD_ID)
+//Comment
 public class Initium {
     public static final String MOD_ID = "initium";
     private static final Logger LOGGER = LogUtils.getLogger();
