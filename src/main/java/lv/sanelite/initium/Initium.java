@@ -1,6 +1,7 @@
 package lv.sanelite.initium;
 
 import com.mojang.logging.LogUtils;
+import lv.sanelite.initium.item.ModItems;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -21,6 +22,7 @@ public class Initium {
     private static final Logger LOGGER = LogUtils.getLogger();
     public Initium() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModItems.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
