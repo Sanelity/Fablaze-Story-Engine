@@ -2,9 +2,9 @@
   "item.initium.uranium": "Uranium",
   "item.initium.raw_uranium": "Raw Uranium",
 
-  "block.initium.uranium_block": "Block of Uranium",
+  "block.initium.uranium_block": "Block of §kUranium",
   "block.initium.uranium_ore": "Uranium ore",
-  "block.initium.deepslate_uranium_ore": "Deepslate uranium ore",
+  "block.initium.deepuranium_ore": "Deepslate uranium ore",
 
   "itemGroup.initiumtab": "Initium Stuff"
 }
