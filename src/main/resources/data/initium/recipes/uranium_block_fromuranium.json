@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "initium:uranium"
+    }
+  },
+  "result": {
+    "item": "initium:uranium_block"
+  }
+}

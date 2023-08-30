@@ -1,6 +1,8 @@
 package lv.sanelite.initium.item;
 
 import lv.sanelite.initium.Initium;
+import lv.sanelite.initium.item.advanced.D6DiceItem;
+import lv.sanelite.initium.rarity.ModRarity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -24,6 +26,13 @@ public class ModItems {
                 .stacksTo(64)
                 .tab(ModCreativeModeTab.INITIUM_TAB)
                 .rarity(Rarity.RARE)
+            )
+    );
+    public static final RegistryObject<Item> DICED6 =
+            ITEMS.register("diced6",() -> new D6DiceItem(new Item.Properties()
+                    .stacksTo(1)
+                    .tab(ModCreativeModeTab.INITIUM_TAB)
+                    .rarity(ModRarity.MYTHICAL)
             )
     );
 

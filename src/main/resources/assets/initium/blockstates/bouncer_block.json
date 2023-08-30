@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "initium:block/bouncer_block" }
+  }
+}

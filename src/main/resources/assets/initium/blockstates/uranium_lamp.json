@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=true": { "model": "initium:block/uranium_lamp_on" },
+    "lit=false": { "model": "initium:block/uranium_lamp_off"}
+  }
+}
