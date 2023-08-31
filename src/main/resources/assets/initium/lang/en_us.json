@@ -9,5 +9,7 @@
   "block.initium.bouncer_block": "Uranium Bouncer",
   "block.initium.uranium_lamp": "Uranium Lamp",
 
-  "itemGroup.initiumtab": "Initium Stuff"
+  "itemGroup.initiumtab": "Initium Stuff",
+
+  "entity.minecraft.villager.initium.bounce_master": "Bouncer"
 }
