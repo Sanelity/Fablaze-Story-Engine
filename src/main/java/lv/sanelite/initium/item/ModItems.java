@@ -1,10 +1,11 @@
 package lv.sanelite.initium.item;
 
 import lv.sanelite.initium.Initium;
+import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.item.advanced.D6DiceItem;
 import lv.sanelite.initium.rarity.ModRarity;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -35,6 +36,24 @@ public class ModItems {
                     .rarity(ModRarity.MYTHICAL)
             )
     );
+    public static final RegistryObject<Item> INFINITUM =
+            ITEMS.register("infinitum",() -> new SwordItem(Tiers.NETHERITE, 10, 5f, new Item.Properties()
+                    .stacksTo(1)
+                    .tab(ModCreativeModeTab.INITIUM_TAB)
+                    .rarity(ModRarity.MYTHICAL)
+                    .durability(4096)
+                    )
+            );
+
+    public static final RegistryObject<Item> SENTRY_SPAWN_EGG =
+            ITEMS.register("sentry_spawn_egg",
+                    () -> new ForgeSpawnEggItem(ModEntityTypes.SENTRY, 0xffffff, 0xab00ba,
+                            new Item.Properties().tab(ModCreativeModeTab.INITIUM_TAB)
+                                    .rarity(ModRarity.MYTHICAL)
+                                    .stacksTo(64)
+                    )
+            );
+
 
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);

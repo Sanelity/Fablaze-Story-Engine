@@ -2,8 +2,15 @@ package lv.sanelite.initium;
 
 import com.mojang.logging.LogUtils;
 import lv.sanelite.initium.block.ModBlocks;
+import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.ModVillager;
+import lv.sanelite.initium.entity.client.SentryRenderer;
 import lv.sanelite.initium.item.ModItems;
+import lv.sanelite.initium.networking.ModMessages;
+import lv.sanelite.initium.painting.ModPaintings;
+import lv.sanelite.initium.world.feature.ModConfiguredFeatures;
+import lv.sanelite.initium.world.feature.ModPlacedFeatures;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -15,6 +22,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
+import software.bernie.geckolib3.GeckoLib;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Initium.MOD_ID)
@@ -27,6 +35,15 @@ public class Initium {
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModVillager.register(modEventBus);
+        ModPaintings.register(modEventBus);
+
+        ModConfiguredFeatures.register(modEventBus);
+        ModPlacedFeatures.register(modEventBus);
+
+
+        ModEntityTypes.register(modEventBus);
+        GeckoLib.initialize();
+
 
         modEventBus.addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.register(this);
@@ -36,7 +53,7 @@ public class Initium {
         event.enqueueWork(()->{
             ModVillager.registerPOIs();
         });
-
+        ModMessages.register();
     }
 
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
@@ -44,6 +61,7 @@ public class Initium {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
 
+            EntityRenderers.register(ModEntityTypes.SENTRY.get(), SentryRenderer::new);
         }
     }
 }

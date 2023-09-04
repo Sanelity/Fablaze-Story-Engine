@@ -2,6 +2,8 @@
   "item.initium.uranium": "Uranium",
   "item.initium.raw_uranium": "Raw Uranium",
   "item.initium.diced6": "D6 Dice",
+  "item.initium.infinitum": "Infinitum",
+  "item.initium.sentry_spawn_egg": "Sentry Spawn egg",
 
   "block.initium.uranium_block": "Block of §kUranium",
   "block.initium.uranium_ore": "Uranium ore",
@@ -11,5 +13,8 @@
 
   "itemGroup.initiumtab": "Initium Stuff",
 
-  "entity.minecraft.villager.initium.bounce_master": "Bouncer"
+  "entity.minecraft.villager.initium.bounce_master": "Bouncer",
+
+  "key.category.initium.base": "Initium: Tutorial mod",
+  "key.initium.cheat": "Cheat key"
 }
