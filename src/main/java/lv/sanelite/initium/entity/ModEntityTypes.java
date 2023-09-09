@@ -19,7 +19,7 @@ public class ModEntityTypes {
     public static final RegistryObject<EntityType<SentryNPC>> SENTRY =
             ENTITY_TYPES.register("sentry",
                     () -> EntityType.Builder.of(SentryNPC::new, MobCategory.MONSTER)
-                            .sized(0.4f, 1.5f)
+                            .sized(0.4f, 1.8f)
                             .build(new ResourceLocation(Initium.MOD_ID, "sentry").toString()));
 
     public static void register(IEventBus eventBus){

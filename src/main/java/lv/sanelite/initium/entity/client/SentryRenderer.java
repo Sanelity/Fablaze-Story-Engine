@@ -11,16 +11,20 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
+
 public class SentryRenderer extends GeoEntityRenderer<SentryNPC> {
     public SentryRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new SentryModel());
         this.shadowRadius = 0.5f;
     }
 
+
     @Override
     public ResourceLocation getTextureLocation(SentryNPC instance) {
         return new ResourceLocation(Initium.MOD_ID, "textures/entity/sentrytexture.png");
     }
+
+
 
     @Override
     public RenderType getRenderType(SentryNPC animatable, float partialTick, PoseStack poseStack,

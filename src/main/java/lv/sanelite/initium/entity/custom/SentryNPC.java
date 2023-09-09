@@ -1,24 +1,29 @@
 package lv.sanelite.initium.entity.custom;
 
+import lv.sanelite.initium.entity.goal.MoveToGoal;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.AbstractVillager;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib3.core.AnimationState;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -28,24 +33,34 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
+@SuppressWarnings({ "unchecked", "rawtypes"})
 public class SentryNPC extends Monster implements IAnimatable {
-    private AnimationFactory factory = new AnimationFactory(this);
+    public Vec3 pointer;
+    private final AnimationFactory factory = new AnimationFactory(this);
 
     public SentryNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
+        pointer = new Vec3(50,90,50);
+        if(Minecraft.getInstance().player != null && level.isClientSide()){
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Registered data X: " + pointer.x));
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Registered data Y: " + pointer.y));
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Registered data Z: " + pointer.z));
+            randomTargeting();
+        }
     }
+    public void randomTargeting(){
+        Minecraft.getInstance().player.sendSystemMessage(Component.literal("Initialization at: " + pointer.x + " " + pointer.y + " " + pointer.z).withStyle(ChatFormatting.GREEN));
+    };
+
     @Override
     protected void registerGoals(){
-        this.goalSelector.addGoal(1,new FloatGoal(this));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this,1.2D,false));
-        this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
+        this.goalSelector.addGoal(1, new MoveToGoal(this, new Vec3(50,90,50), 0.5d));
+        this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this,1f));
+        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, LivingEntity.class, 5f, 1f, false));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
-
-        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, AbstractVillager.class, false));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, IronGolem.class, true));
-        this.targetSelector.addGoal(4, new NearestAttackableTargetGoal<>(this, Creeper.class, true));
     }
+
 
 
     public static AttributeSupplier setAttributes (){
@@ -53,9 +68,16 @@ public class SentryNPC extends Monster implements IAnimatable {
                 .add(Attributes.MAX_HEALTH, 20)
                 .add(Attributes.ATTACK_DAMAGE, 2.0f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
-                .add(Attributes.MOVEMENT_SPEED, 0.2f).build();
+                .add(Attributes.JUMP_STRENGTH, 1.0f)
+                .add(Attributes.MOVEMENT_SPEED, 0.65f).build();
     }
     private <E extends IAnimatable>PlayState predicate(AnimationEvent<E> event){
+        if(this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)){
+            event.getController().markNeedsReload();
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("sentry.swipe.animation", false));
+            this.swinging = false;
+        }
+
         if(event.isMoving()) {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("sentry.walk.animation", true));
             return PlayState.CONTINUE;
@@ -63,14 +85,8 @@ public class SentryNPC extends Monster implements IAnimatable {
         event.getController().setAnimation(new AnimationBuilder().addAnimation("sentry.idle.animation", true));
         return PlayState.CONTINUE;
     }
+
     private PlayState attackPredicate(AnimationEvent event){
-        if(this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)){
-            event.getController().markNeedsReload();
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("sentry.swipe.animation", false));
-            this.swinging = false;
-        }
-
-
 
         return PlayState.CONTINUE;
     }
