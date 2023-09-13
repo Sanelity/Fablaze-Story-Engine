@@ -3,25 +3,18 @@ package lv.sanelite.initium.entity.custom;
 import lv.sanelite.initium.entity.goal.MoveToGoal;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.arguments.NbtTagArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib3.core.AnimationState;
@@ -35,26 +28,18 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 @SuppressWarnings({ "unchecked", "rawtypes"})
 public class SentryNPC extends Monster implements IAnimatable {
-    public Vec3 pointer;
+    public final double x = 0.0d;
+    public final double y = 0.0d;
+    public final double z = 0.0d;
     private final AnimationFactory factory = new AnimationFactory(this);
 
     public SentryNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
-        pointer = new Vec3(50,90,50);
-        if(Minecraft.getInstance().player != null && level.isClientSide()){
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Registered data X: " + pointer.x));
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Registered data Y: " + pointer.y));
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Registered data Z: " + pointer.z));
-            randomTargeting();
-        }
     }
-    public void randomTargeting(){
-        Minecraft.getInstance().player.sendSystemMessage(Component.literal("Initialization at: " + pointer.x + " " + pointer.y + " " + pointer.z).withStyle(ChatFormatting.GREEN));
-    };
 
     @Override
     protected void registerGoals(){
-        this.goalSelector.addGoal(1, new MoveToGoal(this, new Vec3(50,90,50), 0.5d));
+        this.goalSelector.addGoal(1, new MoveToGoal(this, new Vec3(x,y,z), 0.5d));
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this,1f));
         this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, LivingEntity.class, 5f, 1f, false));

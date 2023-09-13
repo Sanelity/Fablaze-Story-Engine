@@ -9,34 +9,50 @@ import net.minecraft.world.phys.Vec3;
 
 public class MoveToGoal extends Goal {
     private final PathfinderMob mob;
-    private final double x;
-    private final double y;
-    private final double z;
-    private final double speed;
+    private double x;
+    private double y;
+    private double z;
+    private double speed;
     private int ticking;
+    private boolean spawncheck = true;
 
     public MoveToGoal(PathfinderMob mob, Vec3 direction, double speed){
         this.mob = mob;
+        this.speed = speed;
+        this.ticking = 0;
         this.x = direction.x();
         this.y = direction.y();
         this.z = direction.z();
-        this.speed = speed;
-        this.ticking = 0;
     }
 
+    private void spawnpoint(Vec3 direction){                                 //Spawnpoint coordinates
+        if (direction.equals(Vec3.ZERO)){
+            this.x = mob.xOld;
+            this.y = mob.yOld;
+            this.z = mob.zOld;
+        }
+        spawncheck = false;
+    };
+
     private void move(){
+        if(mob.tickCount < 20 && mob.xo == 0 && mob.yo == 0 && mob.zo == 0){
+            return;
+        }
+        if(spawncheck) spawnpoint(new Vec3(x,y,z));
         this.mob.getNavigation().moveTo(this.x, this.y, this.z, this.speed);
     }
 
     @Override
     public void tick() {
         move();
-        if(ticking % 20 == 0 && Minecraft.getInstance().player != null){
+        if(mob.tickCount % 20 == 0 && Minecraft.getInstance().player != null){
             Minecraft.getInstance().player.sendSystemMessage(Component.literal
                     ("Current cords.: " + mob.getBlockX() + " " + mob.getBlockY() + " " + mob.getBlockZ())
                     .withStyle(ChatFormatting.RED));
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal
+                            ("Goal target: " + x + " " + y + " " + z)
+                    .withStyle(ChatFormatting.GOLD));
         }
-        ticking++;
     }
 
     @Override
