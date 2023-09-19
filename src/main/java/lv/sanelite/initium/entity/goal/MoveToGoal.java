@@ -9,20 +9,31 @@ import net.minecraft.world.phys.Vec3;
 
 public class MoveToGoal extends Goal {
     private final PathfinderMob mob;
-    private double x;
-    private double y;
-    private double z;
-    private double speed;
+    public static String name;
+    private static double x;
+    private static double y;
+    private static double z;
+    private static double speed;
     private int ticking;
     private boolean spawncheck = true;
 
-    public MoveToGoal(PathfinderMob mob, Vec3 direction, double speed){
+    public MoveToGoal(PathfinderMob mob, Vec3 direction, double movespeed, String mobName){
         this.mob = mob;
-        this.speed = speed;
+        name = mobName;
+        speed = movespeed;
+        x = direction.x();
+        y = direction.y();
+        z = direction.z();
         this.ticking = 0;
-        this.x = direction.x();
-        this.y = direction.y();
-        this.z = direction.z();
+    }
+
+    public static void changeDirection(Vec3 direction, String mobName){
+        if(name.equals(mobName)){
+            x = direction.x;
+            y = direction.y;
+            z = direction.z;
+        }
+
     }
 
     private void spawnpoint(Vec3 direction){                                 //Spawnpoint coordinates

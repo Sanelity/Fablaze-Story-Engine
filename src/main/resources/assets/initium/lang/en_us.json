@@ -5,6 +5,7 @@
   "item.initium.infinitum": "Infinitum",
   "item.initium.sentry_spawn_egg": "Sentry Spawn egg",
 
+
   "block.initium.uranium_block": "Block of §kUranium",
   "block.initium.uranium_ore": "Uranium ore",
   "block.initium.deepuranium_ore": "Deepslate Uranium ore",
@@ -14,6 +15,7 @@
   "itemGroup.initiumtab": "Initium Stuff",
 
   "entity.minecraft.villager.initium.bounce_master": "Bouncer",
+  "entity.initium.sentry": "Sentry",
 
   "key.category.initium.base": "Initium: Tutorial mod",
   "key.initium.cheat": "Cheat key"

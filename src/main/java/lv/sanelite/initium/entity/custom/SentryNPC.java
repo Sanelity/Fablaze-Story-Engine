@@ -1,10 +1,9 @@
 package lv.sanelite.initium.entity.custom;
 
 import lv.sanelite.initium.entity.goal.MoveToGoal;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
@@ -28,24 +27,31 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 @SuppressWarnings({ "unchecked", "rawtypes"})
 public class SentryNPC extends Monster implements IAnimatable {
-    public final double x = 0.0d;
-    public final double y = 0.0d;
-    public final double z = 0.0d;
+    public static double x = 0.0d;
+    public static double y = 0.0d;
+    public static double z = 0.0d;
+    public static String name = "name";
     private final AnimationFactory factory = new AnimationFactory(this);
 
     public SentryNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
+
     }
 
     @Override
     protected void registerGoals(){
-        this.goalSelector.addGoal(1, new MoveToGoal(this, new Vec3(x,y,z), 0.5d));
+        this.goalSelector.addGoal(1, new MoveToGoal(this, new Vec3(x,y,z), 0.5d, name));
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this,1f));
         this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, LivingEntity.class, 5f, 1f, false));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
+    public static void changeMovePoint(Vec3 argument){
+        x = argument.x;
+        y = argument.y;
+        z = argument.z;
+    }
 
 
     public static AttributeSupplier setAttributes (){

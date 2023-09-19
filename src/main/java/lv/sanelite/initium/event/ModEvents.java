@@ -7,10 +7,12 @@ import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.ModVillager;
 import lv.sanelite.initium.entity.custom.SentryNPC;
 import lv.sanelite.initium.item.ModItems;
+import lv.sanelite.initium.util.SaidCommand;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -20,6 +22,11 @@ import java.util.List;
 public class ModEvents {
     @Mod.EventBusSubscriber(modid = Initium.MOD_ID)
     public static class ForgeEvents{
+
+        @SubscribeEvent
+        public static void onCommandsRegister(RegisterCommandsEvent event){
+            new SaidCommand(event.getDispatcher());
+        }
 
 
         @SubscribeEvent
