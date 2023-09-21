@@ -12,8 +12,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.network.chat.Component;
 
-public class SaidCommand {
-    public SaidCommand(CommandDispatcher<CommandSourceStack> dispatcher){
+public class ActorCommand {
+    public ActorCommand(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(Commands.literal("actor")
             .then(Commands.argument("Coordinates", Vec3Argument.vec3())
             .then(Commands.argument("Name", StringArgumentType.word())
