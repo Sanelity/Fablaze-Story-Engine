@@ -27,7 +27,10 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 @SuppressWarnings({ "unchecked", "rawtypes"})
 public class SentryNPC extends Monster implements IAnimatable {
-    //TODO - Abstract entity actor type
+    //TODO - Abstract entity actor type - CurrentTarget
+    //TODO - MAPPING
+
+
     //TODO - Target Memory, Spawnpoint memory??
     //TODO - Skin & Model selector
     //TODO - Universal goals and behavior
