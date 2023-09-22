@@ -36,13 +36,13 @@ public class SentryNPC extends Monster implements IAnimatable {
     public static double x = 0.0d;
     public static double y = 0.0d;
     public static double z = 0.0d;
-    public static String name = "name";
+    public static String name = "none";
     private final AnimationFactory factory = new AnimationFactory(this);
 
     public SentryNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
-
     }
+
 
     @Override
     protected void registerGoals(){
@@ -53,7 +53,12 @@ public class SentryNPC extends Monster implements IAnimatable {
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
-    public static void changeMovePoint(Vec3 argument){
+
+    public void changeName(String rename){
+        name = new String(rename);
+    }
+
+    public void changeMovePoint(Vec3 argument){
         x = argument.x;
         y = argument.y;
         z = argument.z;

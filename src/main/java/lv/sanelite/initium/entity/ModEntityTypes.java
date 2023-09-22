@@ -2,7 +2,6 @@ package lv.sanelite.initium.entity;
 
 import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.entity.custom.SentryNPC;
-import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -18,7 +17,7 @@ public class ModEntityTypes {
 
     public static final RegistryObject<EntityType<SentryNPC>> SENTRY =
             ENTITY_TYPES.register("sentry",
-                    () -> EntityType.Builder.of(SentryNPC::new, MobCategory.MONSTER)
+                    () -> EntityType.Builder.of(SentryNPC::new, MobCategory.CREATURE)
                             .sized(0.4f, 1.8f)
                             .build(new ResourceLocation(Initium.MOD_ID, "sentry").toString()));
 
