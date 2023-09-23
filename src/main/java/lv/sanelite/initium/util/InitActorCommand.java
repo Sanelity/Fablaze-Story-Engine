@@ -6,19 +6,15 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import lv.sanelite.initium.entity.ModEntityTypes;
-import lv.sanelite.initium.entity.custom.SentryNPC;
+import lv.sanelite.initium.entity.custom.ActorNPC;
+import lv.sanelite.initium.entity.custom.NPCMapper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntitySummonArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
-import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 
 public class InitActorCommand {
@@ -32,8 +28,8 @@ public class InitActorCommand {
     public InitActorCommand(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(Commands.literal("init")
             .then(Commands.argument("Coordinates", Vec3Argument.vec3())
-            .then(Commands.argument("Key",StringArgumentType.word())
-            .executes((command) -> summonKeyedActor(command.getSource(), command)))));
+//            .then(Commands.argument("Key",StringArgumentType.word())
+            .executes((command) -> summonKeyedActor(command.getSource(), command))));
     }
 
     private int summonKeyedActor(CommandSourceStack stack, CommandContext command) throws CommandSyntaxException {
@@ -43,8 +39,10 @@ public class InitActorCommand {
         } else {
             ServerLevel serverlevel = stack.getLevel();
 
-            SentryNPC entity = new SentryNPC(ModEntityTypes.SENTRY.get(), serverlevel);
-            entity.changeName(StringArgumentType.getString(command,"Key"));
+            ActorNPC entity = new ActorNPC(ModEntityTypes.ACTOR.get(), serverlevel);
+//            NPCMapper.addListed(StringArgumentType.getString(command,"Key"),entity);
+//            entity.changeName(StringArgumentType.getString(command,"Key"));
+            NPCMapper.availableActors();
 
             entity.moveTo(
                         Vec3Argument.getVec3(command, "Coordinates").x,

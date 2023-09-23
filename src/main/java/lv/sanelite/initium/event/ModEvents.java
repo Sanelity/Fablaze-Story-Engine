@@ -5,7 +5,7 @@ import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.block.ModBlocks;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.ModVillager;
-import lv.sanelite.initium.entity.custom.SentryNPC;
+import lv.sanelite.initium.entity.custom.ActorNPC;
 import lv.sanelite.initium.item.ModItems;
 import lv.sanelite.initium.util.ActorCommand;
 import lv.sanelite.initium.util.InitActorCommand;
@@ -66,7 +66,7 @@ public class ModEvents {
     public static class ModEventBusEvents{
         @SubscribeEvent
         public static void entityAttributeEvent(EntityAttributeCreationEvent event){
-            event.put(ModEntityTypes.SENTRY.get(), SentryNPC.setAttributes());
+            event.put(ModEntityTypes.ACTOR.get(), ActorNPC.setAttributes());
 
         }
     }

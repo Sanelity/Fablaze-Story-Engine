@@ -4,14 +4,13 @@ import com.mojang.logging.LogUtils;
 import lv.sanelite.initium.block.ModBlocks;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.ModVillager;
-import lv.sanelite.initium.entity.client.SentryRenderer;
+import lv.sanelite.initium.entity.client.ActorRenderer;
 import lv.sanelite.initium.item.ModItems;
 import lv.sanelite.initium.networking.ModMessages;
 import lv.sanelite.initium.painting.ModPaintings;
 import lv.sanelite.initium.world.feature.ModConfiguredFeatures;
 import lv.sanelite.initium.world.feature.ModPlacedFeatures;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -20,7 +19,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 import software.bernie.geckolib3.GeckoLib;
 
@@ -61,7 +59,7 @@ public class Initium {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
 
-            EntityRenderers.register(ModEntityTypes.SENTRY.get(), SentryRenderer::new);
+            EntityRenderers.register(ModEntityTypes.ACTOR.get(), ActorRenderer::new);
         }
     }
 }
