@@ -47,7 +47,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> SENTRY_SPAWN_EGG =
             ITEMS.register("sentry_spawn_egg",
-                    () -> new ForgeSpawnEggItem(ModEntityTypes.SENTRY, 0xffffff, 0xab00ba,
+                    () -> new ForgeSpawnEggItem(ModEntityTypes.ACTOR, 0xffffff, 0xc40c40,
                             new Item.Properties().tab(ModCreativeModeTab.INITIUM_TAB)
                                     .rarity(ModRarity.MYTHICAL)
                                     .stacksTo(64)

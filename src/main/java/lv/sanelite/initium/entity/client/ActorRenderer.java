@@ -3,7 +3,7 @@ package lv.sanelite.initium.entity.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import lv.sanelite.initium.Initium;
-import lv.sanelite.initium.entity.custom.SentryNPC;
+import lv.sanelite.initium.entity.custom.ActorNPC;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -12,22 +12,22 @@ import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
 
-public class SentryRenderer extends GeoEntityRenderer<SentryNPC> {
-    public SentryRenderer(EntityRendererProvider.Context renderManager) {
-        super(renderManager, new SentryModel());
+public class ActorRenderer extends GeoEntityRenderer<ActorNPC> {
+    public ActorRenderer(EntityRendererProvider.Context renderManager) {
+        super(renderManager, new ActorModel());
         this.shadowRadius = 0.5f;
     }
 
 
     @Override
-    public ResourceLocation getTextureLocation(SentryNPC instance) {
+    public ResourceLocation getTextureLocation(ActorNPC instance) {
         return new ResourceLocation(Initium.MOD_ID, "textures/entity/sentrytexture.png");
     }
 
 
 
     @Override
-    public RenderType getRenderType(SentryNPC animatable, float partialTick, PoseStack poseStack,
+    public RenderType getRenderType(ActorNPC animatable, float partialTick, PoseStack poseStack,
                                     @Nullable MultiBufferSource bufferSource,
                                     @Nullable VertexConsumer buffer, int packedLight,
                                     ResourceLocation texture) {

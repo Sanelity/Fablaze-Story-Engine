@@ -1,17 +1,17 @@
 package lv.sanelite.initium.entity.client;
 
 import lv.sanelite.initium.Initium;
-import lv.sanelite.initium.entity.custom.SentryNPC;
+import lv.sanelite.initium.entity.custom.ActorNPC;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.processor.IBone;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 import software.bernie.geckolib3.model.provider.data.EntityModelData;
 
-public class SentryModel extends AnimatedGeoModel<SentryNPC> {
+public class ActorModel extends AnimatedGeoModel<ActorNPC> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public void setLivingAnimations(SentryNPC entity, Integer uniqueID, AnimationEvent customPredicate) {
+    public void setLivingAnimations(ActorNPC entity, Integer uniqueID, AnimationEvent customPredicate) {
         super.setLivingAnimations(entity, uniqueID, customPredicate);
         IBone head = this.getAnimationProcessor().getBone("head");
 
@@ -23,17 +23,17 @@ public class SentryModel extends AnimatedGeoModel<SentryNPC> {
     }
 
     @Override
-    public ResourceLocation getModelResource(SentryNPC object) {
+    public ResourceLocation getModelResource(ActorNPC object) {
         return new ResourceLocation(Initium.MOD_ID, "geo/sentry.geo.json");
     }
 
     @Override
-    public ResourceLocation getTextureResource(SentryNPC object) {
+    public ResourceLocation getTextureResource(ActorNPC object) {
         return new ResourceLocation(Initium.MOD_ID, "textures/entity/sentrytexture.png");
     }
 
     @Override
-    public ResourceLocation getAnimationResource(SentryNPC animatable) {
+    public ResourceLocation getAnimationResource(ActorNPC animatable) {
         return new ResourceLocation(Initium.MOD_ID, "animations/sentry.animation.json");
     }
 }

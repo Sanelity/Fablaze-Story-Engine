@@ -1,11 +1,15 @@
 package lv.sanelite.initium.entity.custom;
 
 import lv.sanelite.initium.entity.goal.MoveToGoal;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,6 +17,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -26,40 +31,37 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 @SuppressWarnings({ "unchecked", "rawtypes"})
-public class SentryNPC extends Monster implements IAnimatable {
-    //TODO - Abstract entity actor type - CurrentTarget
-    //TODO - MAPPING
-
+public class ActorNPC extends Monster implements IAnimatable {
+    //Abstract entity actor type - DONE
+    //TODO - MAPPING - CurrentTarget
+    //Change everything to Non-static - DONE
 
     //TODO - Target Memory, Spawnpoint memory??
     //TODO - Skin & Model selector
     //TODO - Universal goals and behavior
     //TODO - NBT tagger and changable properties (Invulnerable, Damagable (With lower health limit))
 
-    public static double x = 0.0d;
-    public static double y = 0.0d;
-    public static double z = 0.0d;
-    public static String name = "none";
+    public double x = 0.0d;
+    public double y = 0.0d;
+    public double z = 0.0d;
+    public boolean tracking = false;
     private final AnimationFactory factory = new AnimationFactory(this);
 
-    public SentryNPC(EntityType<? extends Monster> type, Level level) {
+    public ActorNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
     }
 
-
+//TODO - Register manually MoveToGoal
     @Override
     protected void registerGoals(){
-        this.goalSelector.addGoal(1, new MoveToGoal(this, new Vec3(x,y,z), 0.5d, name));
+        //this.goalSelector.addGoal(1, new MoveToGoal(this, new Vec3(x,y,z), 0.5d, super.getId()));
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this,1f));
-        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, LivingEntity.class, 5f, 1f, false));
+        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5f, 1f, false));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
 
-    public void changeName(String rename){
-        name = new String(rename);
-    }
 
     public void changeMovePoint(Vec3 argument){
         x = argument.x;
@@ -74,7 +76,7 @@ public class SentryNPC extends Monster implements IAnimatable {
                 .add(Attributes.ATTACK_DAMAGE, 2.0f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
                 .add(Attributes.JUMP_STRENGTH, 1.0f)
-                .add(Attributes.MOVEMENT_SPEED, 0.65f).build();
+                .add(Attributes.MOVEMENT_SPEED, 0.28f).build();
     }
     private <E extends IAnimatable>PlayState predicate(AnimationEvent<E> event){
         if(this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)){
@@ -100,6 +102,47 @@ public class SentryNPC extends Monster implements IAnimatable {
     public void registerControllers(AnimationData data) {
         data.addAnimationController(new AnimationController(this,"controller",0,this::predicate));
         data.addAnimationController(new AnimationController(this,"attackController",0,this::attackPredicate));
+    }
+
+//    @Override
+//    public boolean wasKilled(ServerLevel level, LivingEntity entity) {
+//        return super.wasKilled(level, entity);
+//    }
+//    @Override
+//    public void kill() {
+//        NPCMapper.delListed(super.getId());
+//        super.kill();
+//    }
+
+    @Override
+    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Hello! My key is: " + super.getId()));
+            tracking = true;
+        }else{
+            if(tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
+                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Tracking turned off"));
+                tracking = false;
+            }
+        }
+
+        return InteractionResult.PASS;
+    }
+    @Override
+    public void tick(){
+        super.tick();
+        if(this.tickCount % 20 == 0 && Minecraft.getInstance().player != null && tracking){
+            tracker();
+        }
+    }
+
+    public void tracker(){
+        Minecraft.getInstance().player.sendSystemMessage(Component.literal
+                        ("Current cords.: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | Key: " + super.getId())
+                .withStyle(ChatFormatting.RED));
+        Minecraft.getInstance().player.sendSystemMessage(Component.literal
+                        ("Goal target: " + x + " " + y + " " + z)
+                .withStyle(ChatFormatting.GOLD));
     }
 
     @Override

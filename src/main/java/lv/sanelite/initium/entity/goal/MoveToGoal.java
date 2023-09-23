@@ -9,17 +9,17 @@ import net.minecraft.world.phys.Vec3;
 
 public class MoveToGoal extends Goal {
     private final PathfinderMob mob;
-    public static String name;
-    private static double x;
-    private static double y;
-    private static double z;
-    private static double speed;
+    public int id;
+    private double x;
+    private double y;
+    private double z;
+    private double speed;
     private int ticking;
     private boolean spawncheck = true;
 
-    public MoveToGoal(PathfinderMob mob, Vec3 direction, double movespeed, String mobName){
+    public MoveToGoal(PathfinderMob mob, Vec3 direction, double movespeed, int key){
         this.mob = mob;
-        name = mobName;
+        id = key;
         speed = movespeed;
         x = direction.x();
         y = direction.y();
@@ -27,11 +27,11 @@ public class MoveToGoal extends Goal {
         this.ticking = 0;
     }
 
-    public static void changeDirection(Vec3 direction, String mobName){
-        if(name.equals(mobName)){
-            x = direction.x;
-            y = direction.y;
-            z = direction.z;
+    public void changeDirection(Vec3 direction, int key){
+        if(this.id == key){
+            this.x = direction.x;
+            this.y = direction.y;
+            this.z = direction.z;
         }
 
     }
@@ -56,14 +56,6 @@ public class MoveToGoal extends Goal {
     @Override
     public void tick() {
         move();
-        if(mob.tickCount % 20 == 0 && Minecraft.getInstance().player != null){
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                    ("Current cords.: " + mob.getBlockX() + " " + mob.getBlockY() + " " + mob.getBlockZ())
-                    .withStyle(ChatFormatting.RED));
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                            ("Goal target: " + x + " " + y + " " + z)
-                    .withStyle(ChatFormatting.GOLD));
-        }
     }
 
     @Override

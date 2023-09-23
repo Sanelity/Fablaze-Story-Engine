@@ -1,7 +1,7 @@
 package lv.sanelite.initium.entity;
 
 import lv.sanelite.initium.Initium;
-import lv.sanelite.initium.entity.custom.SentryNPC;
+import lv.sanelite.initium.entity.custom.ActorNPC;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -15,9 +15,9 @@ public class ModEntityTypes {
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Initium.MOD_ID);
 
 
-    public static final RegistryObject<EntityType<SentryNPC>> SENTRY =
-            ENTITY_TYPES.register("sentry",
-                    () -> EntityType.Builder.of(SentryNPC::new, MobCategory.CREATURE)
+    public static final RegistryObject<EntityType<ActorNPC>> ACTOR =
+            ENTITY_TYPES.register("actor",
+                    () -> EntityType.Builder.of(ActorNPC::new, MobCategory.CREATURE)
                             .sized(0.4f, 1.8f)
                             .build(new ResourceLocation(Initium.MOD_ID, "sentry").toString()));
 
