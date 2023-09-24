@@ -18,7 +18,6 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 
 public class InitActorCommand {
-    private static final SimpleCommandExceptionType ERROR_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.summon.failed"));
     private static final SimpleCommandExceptionType ERROR_DUPLICATE_UUID = new SimpleCommandExceptionType(Component.translatable("commands.summon.failed.uuid"));
     private static final SimpleCommandExceptionType INVALID_POSITION = new SimpleCommandExceptionType(Component.translatable("commands.summon.invalidPosition"));
 
@@ -28,8 +27,8 @@ public class InitActorCommand {
     public InitActorCommand(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(Commands.literal("init")
             .then(Commands.argument("Coordinates", Vec3Argument.vec3())
-//            .then(Commands.argument("Key",StringArgumentType.word())
-            .executes((command) -> summonKeyedActor(command.getSource(), command))));
+            .then(Commands.argument("Key",StringArgumentType.word())
+            .executes((command) -> summonKeyedActor(command.getSource(), command)))));
     }
 
     private int summonKeyedActor(CommandSourceStack stack, CommandContext command) throws CommandSyntaxException {
@@ -41,14 +40,14 @@ public class InitActorCommand {
 
             ActorNPC entity = new ActorNPC(ModEntityTypes.ACTOR.get(), serverlevel);
 //            NPCMapper.addListed(StringArgumentType.getString(command,"Key"),entity);
-//            entity.changeName(StringArgumentType.getString(command,"Key"));
-            NPCMapper.availableActors();
+//            NPCMapper.availableActors();
 
             entity.moveTo(
                         Vec3Argument.getVec3(command, "Coordinates").x,
                         Vec3Argument.getVec3(command, "Coordinates").y,
                         Vec3Argument.getVec3(command, "Coordinates").z,
                         entity.getYRot(), entity.getXRot());
+
             if (!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entity, stack.getLevel(), (float) entity.getX(), (float) entity.getY(), (float) entity.getZ(), null, MobSpawnType.COMMAND))
                 entity.finalizeSpawn(stack.getLevel(), stack.getLevel().getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND,null, null);
 
@@ -56,12 +55,13 @@ public class InitActorCommand {
                 throw ERROR_DUPLICATE_UUID.create();
             } else {
                 stack.sendSuccess(Component.translatable("commands.summon.success", entity.getDisplayName()), true);
+                registerNewActor(entity,StringArgumentType.getString(command,"Key"));
                 return 1;
             }
         }
     }
-
-
-
-
+    private void registerNewActor(ActorNPC actor, String key){
+        NPCMapper.addListed(key,actor);
+        NPCMapper.availableActors();
+    }
 }

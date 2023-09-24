@@ -30,6 +30,10 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 @SuppressWarnings({ "unchecked", "rawtypes"})
 public class ActorNPC extends Monster implements IAnimatable {
     //Abstract entity actor type - DONE
@@ -44,12 +48,16 @@ public class ActorNPC extends Monster implements IAnimatable {
     public double x = 0.0d;
     public double y = 0.0d;
     public double z = 0.0d;
+    public String key;
     public boolean tracking = false;
     private final AnimationFactory factory = new AnimationFactory(this);
 
     public ActorNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
+        NPCMapper.addListed(String.valueOf(super.getId()),this);
+        this.key = String.valueOf(super.getId());
     }
+
 
 //TODO - Register manually MoveToGoal
     @Override
@@ -59,9 +67,12 @@ public class ActorNPC extends Monster implements IAnimatable {
         this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this,1f));
         this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5f, 1f, false));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+
     }
 
-
+    public void changeMyKey(String key){
+        this.key = key;
+    }
 
     public void changeMovePoint(Vec3 argument){
         x = argument.x;
@@ -92,12 +103,10 @@ public class ActorNPC extends Monster implements IAnimatable {
         event.getController().setAnimation(new AnimationBuilder().addAnimation("sentry.idle.animation", true));
         return PlayState.CONTINUE;
     }
-
     private PlayState attackPredicate(AnimationEvent event){
 
         return PlayState.CONTINUE;
     }
-
     @Override
     public void registerControllers(AnimationData data) {
         data.addAnimationController(new AnimationController(this,"controller",0,this::predicate));
@@ -117,7 +126,9 @@ public class ActorNPC extends Monster implements IAnimatable {
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
+
             Minecraft.getInstance().player.sendSystemMessage(Component.literal("Hello! My key is: " + super.getId()));
+
             tracking = true;
         }else{
             if(tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
@@ -132,13 +143,17 @@ public class ActorNPC extends Monster implements IAnimatable {
     public void tick(){
         super.tick();
         if(this.tickCount % 20 == 0 && Minecraft.getInstance().player != null && tracking){
+
             tracker();
+        }
+        if(!isAlive()){
+            NPCMapper.delListed(this.key);
         }
     }
 
     public void tracker(){
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                        ("Current cords.: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | Key: " + super.getId())
+                        ("Current cords.: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | Key: " + super.getId() + " | " + this.key)
                 .withStyle(ChatFormatting.RED));
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
                         ("Goal target: " + x + " " + y + " " + z)
