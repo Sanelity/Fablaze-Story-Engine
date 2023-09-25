@@ -14,9 +14,7 @@ public class NPCMapper {
     public static void addListed (String key, ActorNPC actor){
         int id = actor.getId();
         if(keyID.containsValue(id)){
-            keyID.remove((String.valueOf(id)));
-            entityKeyed.remove(id);
-            actor.key = key;
+            keyID.remove(String.valueOf(id));
         }
         keyID.put(key, id);
         entityKeyed.put(id, actor);
@@ -28,17 +26,19 @@ public class NPCMapper {
         }
     }
 
-    public static void clearDead (){
-    //TODO - Clearing logic
+    public static int clearDead (){
+    //TODO - Clearing logic - Possibly Not Actual
+        return 1;
     }
 
-    public static void availableActors(){
+    public static int availableActors(){
             Set<String> keyCollection;
             Set<Integer> idCollection;
             keyCollection = keyID.keySet();
             idCollection = entityKeyed.keySet();
             Minecraft.getInstance().player.sendSystemMessage(Component.literal(keyCollection.toString()).withStyle(ChatFormatting.GREEN));
             Minecraft.getInstance().player.sendSystemMessage(Component.literal(idCollection.toString()).withStyle(ChatFormatting.BLUE));
+            return 1;
     }
 
 

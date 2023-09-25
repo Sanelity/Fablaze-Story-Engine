@@ -1,39 +1,35 @@
 package lv.sanelite.initium.entity.goal;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.phys.Vec3;
 
 public class MoveToGoal extends Goal {
     private final PathfinderMob mob;
-    public int id;
-    private double x;
-    private double y;
-    private double z;
-    private double speed;
-    private int ticking;
+    private double x = 0;
+    private double y = 0;
+    private double z = 0;
+    private double speed = 0.5d;
     private boolean spawncheck = true;
+    private boolean active = false;
 
-    public MoveToGoal(PathfinderMob mob, Vec3 direction, double movespeed, int key){
+    public MoveToGoal(PathfinderMob mob, Vec3 direction, Double speed){
         this.mob = mob;
-        id = key;
-        speed = movespeed;
-        x = direction.x();
-        y = direction.y();
-        z = direction.z();
-        this.ticking = 0;
+        this.speed = speed;
+        start(direction);
     }
 
-    public void changeDirection(Vec3 direction, int key){
-        if(this.id == key){
-            this.x = direction.x;
-            this.y = direction.y;
-            this.z = direction.z;
-        }
+    @Override
+    public void stop() {
+        super.stop();
+    }
 
+    public void start(Vec3 direction){
+        super.start();
+        this.x = direction.x;
+        this.y = direction.y;
+        this.z = direction.z;
+        this.active = true;
     }
 
     private void spawnpoint(Vec3 direction){                                 //Spawnpoint coordinates
@@ -55,7 +51,8 @@ public class MoveToGoal extends Goal {
 
     @Override
     public void tick() {
-        move();
+        super.tick();
+        if(active) move();
     }
 
     @Override

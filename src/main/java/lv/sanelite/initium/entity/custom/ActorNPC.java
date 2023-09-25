@@ -30,57 +30,76 @@ import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @SuppressWarnings({ "unchecked", "rawtypes"})
 public class ActorNPC extends Monster implements IAnimatable {
     //Abstract entity actor type - DONE
-    //TODO - MAPPING - CurrentTarget
+    //MAPPING - CurrentTarget - DONE
     //Change everything to Non-static - DONE
 
-    //TODO - Target Memory, Spawnpoint memory??
+    //TODO - Target Memory, Spawnpoint memory?? MEMORY!!!
     //TODO - Skin & Model selector
-    //TODO - Universal goals and behavior
+    //TODO - Universal goals and behavior - PROBLEMATIC!!!
     //TODO - NBT tagger and changable properties (Invulnerable, Damagable (With lower health limit))
 
-    public double x = 0.0d;
-    public double y = 0.0d;
-    public double z = 0.0d;
+    //Init variables
+    public Vec3 TARGET = new Vec3(0d,0d,0d);
+    public double SPEED;
+
+    public boolean ACTIVE = true;
+
     public String key;
     public boolean tracking = false;
-    private final AnimationFactory factory = new AnimationFactory(this);
+    public boolean spawncheck = true;
 
+
+    private final AnimationFactory factory = new AnimationFactory(this);
+    //Constructor
     public ActorNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
-        NPCMapper.addListed(String.valueOf(super.getId()),this);
+        if(!level.isClientSide()){
+            NPCMapper.addListed(String.valueOf(super.getId()),this);
+        }
         this.key = String.valueOf(super.getId());
     }
 
+    //Moving logic
+    public void nextTarget(Vec3 direction, double speed, boolean bypass){
+        if(bypass){
+            TARGET = direction; this.SPEED = speed;
+        }else if(direction.equals(Vec3.ZERO)){
+            TARGET = new Vec3(xOld, yOld, zOld);
+            spawncheck = false;
+        }else{
+            TARGET = direction; this.SPEED = speed;
+        }
+    }
+    public void moveToTarget(){
+        this.getNavigation().moveTo(TARGET.x, TARGET.y, TARGET.z, SPEED);
+    }
 
-//TODO - Register manually MoveToGoal
+    public void reachLogic(){
+        if(ACTIVE && (  new Vec3(xo,yo,zo).subtract(TARGET).length() <=  1
+                    ||  new Vec3(xo,yo,zo).subtract(TARGET).length() >= -1  )){
+            ACTIVE = false;
+        }else if(   new Vec3(xo,yo,zo).subtract(TARGET).length() >=  5
+                ||  new Vec3(xo,yo,zo).subtract(TARGET).length() <= -5  ){
+            ACTIVE = true;
+        }
+    }
+
+
+
+    //Behavior
     @Override
     protected void registerGoals(){
-        //this.goalSelector.addGoal(1, new MoveToGoal(this, new Vec3(x,y,z), 0.5d, super.getId()));
         this.goalSelector.addGoal(1, new FloatGoal(this));
         this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this,1f));
         this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5f, 1f, false));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
-
     }
 
-    public void changeMyKey(String key){
-        this.key = key;
-    }
-
-    public void changeMovePoint(Vec3 argument){
-        x = argument.x;
-        y = argument.y;
-        z = argument.z;
-    }
-
-
+    //Animation
     public static AttributeSupplier setAttributes (){
         return Monster.createMonsterAttributes()
                 .add(Attributes.MAX_HEALTH, 20)
@@ -107,22 +126,19 @@ public class ActorNPC extends Monster implements IAnimatable {
 
         return PlayState.CONTINUE;
     }
+
     @Override
     public void registerControllers(AnimationData data) {
         data.addAnimationController(new AnimationController(this,"controller",0,this::predicate));
         data.addAnimationController(new AnimationController(this,"attackController",0,this::attackPredicate));
     }
 
-//    @Override
-//    public boolean wasKilled(ServerLevel level, LivingEntity entity) {
-//        return super.wasKilled(level, entity);
-//    }
-//    @Override
-//    public void kill() {
-//        NPCMapper.delListed(super.getId());
-//        super.kill();
-//    }
+    @Override
+    public AnimationFactory getFactory() {
+        return factory;
+    }
 
+    //Interaction
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
@@ -139,6 +155,8 @@ public class ActorNPC extends Monster implements IAnimatable {
 
         return InteractionResult.PASS;
     }
+
+    //Tick logic
     @Override
     public void tick(){
         super.tick();
@@ -146,25 +164,30 @@ public class ActorNPC extends Monster implements IAnimatable {
 
             tracker();
         }
-        if(!isAlive()){
+        if(!isAlive() && !level.isClientSide()){
             NPCMapper.delListed(this.key);
         }
+        if(spawncheck && tickCount <= 5){
+            nextTarget(this.TARGET, 1d, false);
+        }
+        if(tickCount % 5 == 0)reachLogic();
+        if(ACTIVE && tickCount % 5 == 0) moveToTarget();
+
+
+
     }
 
+    //Debugging
     public void tracker(){
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
                         ("Current cords.: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | Key: " + super.getId() + " | " + this.key)
                 .withStyle(ChatFormatting.RED));
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                        ("Goal target: " + x + " " + y + " " + z)
+                        ("Goal target: " + TARGET.x + " " + TARGET.y + " " + TARGET.z)
                 .withStyle(ChatFormatting.GOLD));
     }
 
-    @Override
-    public AnimationFactory getFactory() {
-        return factory;
-    }
-
+    //Sounds
     protected void playStepSound(BlockPos pos, BlockState state){
         this.playSound(SoundEvents.AXOLOTL_ATTACK, 0.15f, 1.0f);
     }
@@ -172,5 +195,4 @@ public class ActorNPC extends Monster implements IAnimatable {
     protected SoundEvent getHurtSound(DamageSource damageSourceIn){ return SoundEvents.CAT_HURT;}
     protected SoundEvent getDeathSound(){return SoundEvents.CAT_DEATH;}
     protected float getSoundVolume(){return 0.25f;}
-
 }
