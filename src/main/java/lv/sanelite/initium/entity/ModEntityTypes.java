@@ -17,7 +17,7 @@ public class ModEntityTypes {
 
     public static final RegistryObject<EntityType<ActorNPC>> ACTOR =
             ENTITY_TYPES.register("actor",
-                    () -> EntityType.Builder.of(ActorNPC::new, MobCategory.CREATURE)
+                    () -> EntityType.Builder.of(ActorNPC::new, MobCategory.AMBIENT)
                             .sized(0.4f, 1.8f)
                             .build(new ResourceLocation(Initium.MOD_ID, "sentry").toString()));
 
