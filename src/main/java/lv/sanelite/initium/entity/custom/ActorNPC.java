@@ -1,18 +1,16 @@
 package lv.sanelite.initium.entity.custom;
 
-import lv.sanelite.initium.entity.goal.MoveToGoal;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -51,16 +49,22 @@ public class ActorNPC extends Monster implements IAnimatable {
     public String key;
     public boolean tracking = false;
     public boolean spawncheck = true;
+    CompoundTag NBT;
 
 
     private final AnimationFactory factory = new AnimationFactory(this);
     //Constructor
     public ActorNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
-        if(!level.isClientSide()){
-            NPCMapper.addListed(String.valueOf(super.getId()),this);
-        }
+
         this.key = String.valueOf(super.getId());
+        setCustomName(Component.literal(this.key));
+
+        if(!level.isClientSide()){
+            NPCMapper.addListed(key,this);
+        }
+
+
     }
 
     //Moving logic
@@ -142,9 +146,7 @@ public class ActorNPC extends Monster implements IAnimatable {
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
-
             Minecraft.getInstance().player.sendSystemMessage(Component.literal("Hello! My key is: " + super.getId()));
-
             tracking = true;
         }else{
             if(tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
@@ -152,8 +154,10 @@ public class ActorNPC extends Monster implements IAnimatable {
                 tracking = false;
             }
         }
-
         return InteractionResult.PASS;
+    }
+    public void setNameVisibility(boolean bool){
+        setCustomNameVisible(bool);
     }
 
     //Tick logic

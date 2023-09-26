@@ -1,6 +1,7 @@
 package lv.sanelite.initium.util;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -13,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
+import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -29,8 +31,13 @@ public class ActorCommand {
 
             .then(Commands.literal("list").executes(this::listing))                     // - /actor list = Execute
 
-            .then(Commands.literal("eliminate")                                         // - /actor eliminate
-            .then(Commands.argument("Name", StringArgumentType.word())                  // - /actor eliminate "Name"
+            .then(Commands.literal("name")                                              // - /actor name ...
+            .then(Commands.argument("Name",StringArgumentType.word())                   // - /actor name "Name" ...
+            .then(Commands.argument("Boolean", BoolArgumentType.bool())                 // - /actor name "Name" "Boolean"
+            .executes(this::setVisibility))))
+
+            .then(Commands.literal("eliminate")                                         // - /actor eliminate ...
+            .then(Commands.argument("Name", StringArgumentType.word())                  // - /actor eliminate "Name" ...
             .executes(this::eliminate))));                                                       //Execute
     }
     public int listing(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
@@ -43,7 +50,6 @@ public class ActorCommand {
         NPCMapper.delListed(StringArgumentType.getString(command, "Name"));
         return 1;
     }
-
     public int resendTarged(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
         ActorNPC entity = getEntity(StringArgumentType.getString(command,"Name"));
         entity.nextTarget(
@@ -69,9 +75,14 @@ public class ActorCommand {
 
         return 1;
     }
-    public ActorNPC getEntity(String key){
+
+    public int setVisibility(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
+        ActorNPC entity = getEntity(StringArgumentType.getString(command,"Name"));
+        entity.setCustomNameVisible(BoolArgumentType.getBool(command, "Boolean"));
+        return 1;
+    }
+    private ActorNPC getEntity(String key){
         int id = NPCMapper.keyID.get(key);
         return NPCMapper.entityKeyed.get(id);
     }
-
 }
