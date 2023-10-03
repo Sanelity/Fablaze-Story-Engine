@@ -3,6 +3,7 @@ package lv.sanelite.initium.entity.custom;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraftforge.event.level.LevelEvent;
 
 
 import java.util.*;
@@ -50,7 +51,6 @@ public class NPCMapper {
             return true;
         }else return false;
     }
-
 
 
     public static int availableActors(){

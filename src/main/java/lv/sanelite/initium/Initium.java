@@ -5,6 +5,7 @@ import lv.sanelite.initium.block.ModBlocks;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.ModVillager;
 import lv.sanelite.initium.entity.client.ActorRenderer;
+import lv.sanelite.initium.event.ModForgeEvent;
 import lv.sanelite.initium.item.ModItems;
 import lv.sanelite.initium.networking.ModMessages;
 import lv.sanelite.initium.painting.ModPaintings;
@@ -13,6 +14,7 @@ import lv.sanelite.initium.world.feature.ModPlacedFeatures;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -30,6 +32,8 @@ public class Initium {
     private static final Logger LOGGER = LogUtils.getLogger();
     public Initium() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus forgebus = MinecraftForge.EVENT_BUS;
+
         ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModVillager.register(modEventBus);
@@ -44,7 +48,9 @@ public class Initium {
 
 
         modEventBus.addListener(this::commonSetup);
-        MinecraftForge.EVENT_BUS.register(this);
+        forgebus.addListener(ModForgeEvent::onLoad);
+        forgebus.register(this);
+
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {

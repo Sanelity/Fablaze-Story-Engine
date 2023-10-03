@@ -61,7 +61,7 @@ public class InitActorCommand {
         }
     }
     private void registerNewActor(ActorNPC actor, String key){
-        NPCMapper.addListed(key,actor);
+//        NPCMapper.addListed(key,actor);
         NPCMapper.availableActors();
     }
 }
