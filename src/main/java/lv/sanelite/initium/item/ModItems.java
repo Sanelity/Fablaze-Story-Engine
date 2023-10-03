@@ -2,6 +2,7 @@ package lv.sanelite.initium.item;
 
 import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.entity.ModEntityTypes;
+import lv.sanelite.initium.item.advanced.AddActorToolItem;
 import lv.sanelite.initium.item.advanced.D6DiceItem;
 import lv.sanelite.initium.rarity.ModRarity;
 import net.minecraft.world.item.*;
@@ -51,6 +52,15 @@ public class ModItems {
                             new Item.Properties().tab(ModCreativeModeTab.INITIUM_TAB)
                                     .rarity(ModRarity.MYTHICAL)
                                     .stacksTo(64)
+                    )
+            );
+
+    public static final  RegistryObject<Item> ADD_TOOL =
+            ITEMS.register("add_tool",
+                    () -> new AddActorToolItem(new Item.Properties()
+                            .stacksTo(1)
+                            .tab(ModCreativeModeTab.INITIUM_TAB)
+                            .rarity(ModRarity.MYTHICAL)
                     )
             );
 

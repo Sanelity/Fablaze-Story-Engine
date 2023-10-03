@@ -27,7 +27,8 @@ public class ActorCommand {
             .then(Commands.argument("Coordinates", Vec3Argument.vec3())                 // - /actor move "Coordinates" ...
             .then(Commands.argument("Name", StringArgumentType.word())                  // - /actor move "Coordinates" "Name" ...
             .then(Commands.argument("Speed", DoubleArgumentType.doubleArg())            // - /actor move "Coordinates" "Name" "Speed" ...
-            .executes(this::resendTarged)))))                                                    //Execute
+            .then(Commands.argument("Bypass", BoolArgumentType.bool())                  // - /actor move "Coordinates" "Name" "Speed" "Bypass" ...
+            .executes(this::resendTarged))))))                                                   //Execute
 
             .then(Commands.literal("list").executes(this::listing))                     // - /actor list = Execute
 
@@ -44,8 +45,7 @@ public class ActorCommand {
         return NPCMapper.availableActors();
     }
     public int eliminate(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        int id = NPCMapper.keyID.get(StringArgumentType.getString(command, "Name"));
-        Entity killable = NPCMapper.entityKeyed.get(id);
+        Entity killable = getEntity(StringArgumentType.getString(command, "Name"));
         killable.kill();
         NPCMapper.delListed(StringArgumentType.getString(command, "Name"));
         return 1;
@@ -55,7 +55,7 @@ public class ActorCommand {
         entity.nextTarget(
                 Vec3Argument.getVec3(command,"Coordinates"),
                 DoubleArgumentType.getDouble(command,"Speed"),
-                false
+                BoolArgumentType.getBool(command, "Bypass")
         );
 
         if(Minecraft.getInstance().player != null){
@@ -82,7 +82,10 @@ public class ActorCommand {
         return 1;
     }
     private ActorNPC getEntity(String key){
-        int id = NPCMapper.keyID.get(key);
-        return NPCMapper.entityKeyed.get(id);
+        return NPCMapper.getActor(key);
+
+
+//        int id = NPCMapper.keyID.get(key);
+//        return NPCMapper.entityKeyed.get(id);
     }
 }
