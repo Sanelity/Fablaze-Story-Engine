@@ -3,7 +3,6 @@ package lv.sanelite.initium.entity.custom;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -18,6 +17,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.DimensionDataStorage;
 import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib3.core.AnimationState;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -34,73 +34,39 @@ public class ActorNPC extends Monster implements IAnimatable {
     //Abstract entity actor type - DONE
     //MAPPING - CurrentTarget - DONE
     //Change everything to Non-static - DONE
+    //Memory - DONE
 
-    //TODO - Target Memory, Spawnpoint memory?? MEMORY!!!
+    //TODO - Complete Data Saving/Loading FIX FIX FIX!!!!!!
     //TODO - Skin & Model selector
     //TODO - Universal goals and behavior - PROBLEMATIC!!!
     //TODO - NBT tagger and changable properties (Invulnerable, Damagable (With lower health limit))
 
-    //Init variables
+    //Variables
+    public String KEY = String.valueOf(this.getId());
     public Vec3 TARGET = new Vec3(0d,0d,0d);
-    public double SPEED;
+    public double SPEED = 0.68d;
 
+    public double ENTER = 0.5d;
+    public double LEAVE = 1.5d;
+
+    public boolean INITIALIZED = false;
     public boolean ACTIVE = true;
 
-    public String key;
+    //Debug - Indetermined
     public boolean tracking = false;
-    public boolean spawncheck = true;
-    CompoundTag NBT;
 
 
     private final AnimationFactory factory = new AnimationFactory(this);
+
     //Constructor
     public ActorNPC(EntityType<? extends Monster> type, Level level) {
         super(type, level);
 
-        this.key = String.valueOf(super.getId());
-        setCustomName(Component.literal(this.key));
-
         if(!level.isClientSide()){
-            NPCMapper.addListed(key,this);
+                NPCMapper.addListed(KEY,this);
+
         }
 
-
-    }
-
-    //Moving logic
-    public void nextTarget(Vec3 direction, double speed, boolean bypass){
-        if(bypass){
-            TARGET = direction; this.SPEED = speed;
-        }else if(direction.equals(Vec3.ZERO)){
-            TARGET = new Vec3(xOld, yOld, zOld);
-            spawncheck = false;
-        }else{
-            TARGET = direction; this.SPEED = speed;
-        }
-    }
-    public void moveToTarget(){
-        this.getNavigation().moveTo(TARGET.x, TARGET.y, TARGET.z, SPEED);
-    }
-
-    public void reachLogic(){
-        if(ACTIVE && (  new Vec3(xo,yo,zo).subtract(TARGET).length() <=  1
-                    ||  new Vec3(xo,yo,zo).subtract(TARGET).length() >= -1  )){
-            ACTIVE = false;
-        }else if(   new Vec3(xo,yo,zo).subtract(TARGET).length() >=  5
-                ||  new Vec3(xo,yo,zo).subtract(TARGET).length() <= -5  ){
-            ACTIVE = true;
-        }
-    }
-
-
-
-    //Behavior
-    @Override
-    protected void registerGoals(){
-        this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this,1f));
-        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5f, 1f, false));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
     //Animation
@@ -142,11 +108,101 @@ public class ActorNPC extends Monster implements IAnimatable {
         return factory;
     }
 
+    //Data
+        //Complex
+    public void remember(){
+        this.KEY = getKey();
+        this.TARGET = getActiveTarget();
+        this.SPEED = getMoveSpeed();
+        this.ACTIVE = isActive();
+        this.ENTER = getEnterRadius();
+        this.LEAVE = getLeaveRadius();
+        this.INITIALIZED = isInitialized();
+
+    }
+    public void setZone(double enter, double leave){
+        this.ENTER = enter; setEnterRadius(enter);
+        this.LEAVE = leave; setLeaveRadius(leave);
+    }
+
+    public void save(){
+        this.getPersistentData().putString("KEY", this.KEY);
+    }
+
+
+        //Single
+    public void setKey(String name){
+        this.KEY = name;
+        this.getPersistentData().putString("KEY", name);
+    }
+    public String getKey(){
+        return this.getPersistentData().getString("KEY");
+    }
+
+    public void setActiveTarget(Vec3 direction){
+        this.TARGET = direction;
+
+        this.getPersistentData().putDouble("tx", direction.x);
+        this.getPersistentData().putDouble("ty", direction.y);
+        this.getPersistentData().putDouble("tz", direction.z);
+    }
+    public Vec3 getActiveTarget(){
+        double x = this.getPersistentData().getDouble("tx");
+        double y = this.getPersistentData().getDouble("ty");
+        double z = this.getPersistentData().getDouble("tz");
+        return new Vec3(x,y,z);
+    }
+
+    public void setMoveSpeed(double speed){
+        this.SPEED = speed;
+
+        this.getPersistentData().putDouble("speed", speed);
+    }
+    public double getMoveSpeed(){
+        return this.getPersistentData().getDouble("speed");
+    }
+
+    public void setActivity(boolean state){
+        this.ACTIVE = state;
+
+        this.getPersistentData().putBoolean("activity", state);
+    }
+    public boolean isActive(){
+        return this.getPersistentData().getBoolean("activity");
+    }
+
+    public void setLeaveRadius(double rad){
+        this.LEAVE = rad;
+
+        this.getPersistentData().putDouble("leave", rad);
+    }
+    public double getLeaveRadius(){
+        return this.getPersistentData().getDouble("leave");
+    }
+    public void setEnterRadius(double rad) {
+        this.ENTER = rad;
+
+        this.getPersistentData().putDouble("enter", rad);
+    }
+    public double getEnterRadius(){
+        return this.getPersistentData().getDouble("enter");
+    }
+
+    public void setInitialized(boolean state){
+        this.INITIALIZED = state;
+        this.getPersistentData().putBoolean("initialized", state);
+    }
+    public boolean isInitialized(){
+        return this.getPersistentData().getBoolean("initialized");
+    }
+
     //Interaction
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Hello! My key is: " + super.getId()));
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal("Hello! My KEY is: " + this.getId()));
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal("My data: " + getKey()));
+
             tracking = true;
         }else{
             if(tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
@@ -156,8 +212,32 @@ public class ActorNPC extends Monster implements IAnimatable {
         }
         return InteractionResult.PASS;
     }
-    public void setNameVisibility(boolean bool){
-        setCustomNameVisible(bool);
+
+    //Moving logic
+    public void nextTarget(Vec3 direction, double speed, boolean bypass){
+        setActivity(true);
+
+        if(bypass){
+            TARGET = direction; this.SPEED = speed;
+        }else if(direction.equals(Vec3.ZERO)){
+            TARGET = new Vec3(xOld, yOld, zOld);
+            setInitialized(true);
+
+        }else{
+            TARGET = direction; this.SPEED = speed;
+        }
+    }
+    public void moveToTarget(){
+        this.getNavigation().moveTo(TARGET.x, TARGET.y, TARGET.z, SPEED);
+    }
+
+    public void reachLogic(){
+        if(ACTIVE && (Math.abs(new Vec3(xo,yo,zo).subtract(TARGET).length()) <= ENTER)){
+            setActivity(false);
+        }else if(Math.abs(new Vec3(xo,yo,zo).subtract(TARGET).length()) >= LEAVE){
+            setActivity(true);
+            moveToTarget();
+        }
     }
 
     //Tick logic
@@ -168,14 +248,16 @@ public class ActorNPC extends Monster implements IAnimatable {
 
             tracker();
         }
-        if(!isAlive() && !level.isClientSide()){
-            NPCMapper.delListed(this.key);
-        }
-        if(spawncheck && tickCount <= 5){
+        if(!isInitialized()){
             nextTarget(this.TARGET, 1d, false);
+            remember();
         }
-        if(tickCount % 5 == 0)reachLogic();
-        if(ACTIVE && tickCount % 5 == 0) moveToTarget();
+
+        if(!isAlive() && !level.isClientSide()){
+            NPCMapper.delListed(this.KEY);
+        }
+
+        if(tickCount % 20 == 0)reachLogic();
 
 
 
@@ -184,11 +266,20 @@ public class ActorNPC extends Monster implements IAnimatable {
     //Debugging
     public void tracker(){
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                        ("Current cords.: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | Key: " + super.getId() + " | " + this.key)
+                        ("Current cords.: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | Id: " + this.getId() + " | " + this.KEY)
                 .withStyle(ChatFormatting.RED));
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                        ("Goal target: " + TARGET.x + " " + TARGET.y + " " + TARGET.z)
+                        ("Target: " + TARGET.x + " " + TARGET.y + " " + TARGET.z)
                 .withStyle(ChatFormatting.GOLD));
+    }
+
+    //Behavior
+    @Override
+    protected void registerGoals(){
+        this.goalSelector.addGoal(1, new FloatGoal(this));
+        this.goalSelector.addGoal(1, new WaterAvoidingRandomStrollGoal(this,1f));
+        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5f, 1f, false));
+        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
     //Sounds

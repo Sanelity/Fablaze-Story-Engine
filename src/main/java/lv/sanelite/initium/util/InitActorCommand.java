@@ -41,7 +41,7 @@ public class InitActorCommand {
             ActorNPC entity = new ActorNPC(ModEntityTypes.ACTOR.get(), serverlevel);
 //            NPCMapper.addListed(StringArgumentType.getString(command,"Key"),entity);
 //            NPCMapper.availableActors();
-
+            entity.setKey(StringArgumentType.getString(command,"Key"));
             entity.moveTo(
                         Vec3Argument.getVec3(command, "Coordinates").x,
                         Vec3Argument.getVec3(command, "Coordinates").y,
