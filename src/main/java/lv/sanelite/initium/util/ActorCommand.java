@@ -8,16 +8,13 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lv.sanelite.initium.entity.custom.ActorNPC;
 import lv.sanelite.initium.entity.custom.NPCMapper;
-import lv.sanelite.initium.entity.goal.MoveToGoal;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
-import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.gameevent.GameEvent;
 
 public class ActorCommand {
     public ActorCommand(CommandDispatcher<CommandSourceStack> dispatcher){
@@ -27,7 +24,7 @@ public class ActorCommand {
             .then(Commands.argument("Coordinates", Vec3Argument.vec3())                 // - /actor move "Coordinates" ...
             .then(Commands.argument("Name", StringArgumentType.word())                  // - /actor move "Coordinates" "Name" ...
             .then(Commands.argument("Speed", DoubleArgumentType.doubleArg())            // - /actor move "Coordinates" "Name" "Speed" ...
-            .then(Commands.argument("Bypass", BoolArgumentType.bool())                  // - /actor move "Coordinates" "Name" "Speed" "Bypass" ...
+            .then(Commands.argument("Bypass", BoolArgumentType.bool())                  // - /actor move "Coordinates" "Name" "Speed" "Bypass"...
             .executes(this::resendTarged))))))                                                   //Execute
 
             .then(Commands.literal("list").executes(this::listing))                     // - /actor list = Execute
@@ -52,7 +49,7 @@ public class ActorCommand {
     }
     public int resendTarged(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
         ActorNPC entity = getEntity(StringArgumentType.getString(command,"Name"));
-        entity.nextTarget(
+        entity.newTarget(
                 Vec3Argument.getVec3(command,"Coordinates"),
                 DoubleArgumentType.getDouble(command,"Speed"),
                 BoolArgumentType.getBool(command, "Bypass")

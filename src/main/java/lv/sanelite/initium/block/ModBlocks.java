@@ -6,7 +6,7 @@ import lv.sanelite.initium.block.advanced.BouncerBlock;
 import lv.sanelite.initium.block.advanced.UraniumLamp;
 import lv.sanelite.initium.item.ModCreativeModeTab;
 import lv.sanelite.initium.item.ModItems;
-import lv.sanelite.initium.rarity.ModRarity;
+import lv.sanelite.initium.util.ModRarity;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;

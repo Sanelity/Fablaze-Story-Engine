@@ -4,7 +4,7 @@ import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.item.advanced.AddActorToolItem;
 import lv.sanelite.initium.item.advanced.D6DiceItem;
-import lv.sanelite.initium.rarity.ModRarity;
+import lv.sanelite.initium.util.ModRarity;
 import net.minecraft.world.item.*;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;

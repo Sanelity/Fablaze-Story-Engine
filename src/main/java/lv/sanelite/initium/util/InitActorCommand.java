@@ -7,7 +7,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.custom.ActorNPC;
-import lv.sanelite.initium.entity.custom.NPCMapper;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
@@ -25,10 +24,11 @@ public class InitActorCommand {
     // TODO HIGH PRIORITY TASK *** Change SentryNPC class initialization to fit in Keying!!!
 
     public InitActorCommand(CommandDispatcher<CommandSourceStack> dispatcher){
-        dispatcher.register(Commands.literal("init")
+        dispatcher.register(Commands.literal("actor")
+            .then(Commands.literal("new")
             .then(Commands.argument("Coordinates", Vec3Argument.vec3())
             .then(Commands.argument("Key",StringArgumentType.word())
-            .executes((command) -> summonKeyedActor(command.getSource(), command)))));
+            .executes((command) -> summonKeyedActor(command.getSource(), command))))));
     }
 
     private int summonKeyedActor(CommandSourceStack stack, CommandContext command) throws CommandSyntaxException {
@@ -39,8 +39,6 @@ public class InitActorCommand {
             ServerLevel serverlevel = stack.getLevel();
 
             ActorNPC entity = new ActorNPC(ModEntityTypes.ACTOR.get(), serverlevel);
-//            NPCMapper.addListed(StringArgumentType.getString(command,"Key"),entity);
-//            NPCMapper.availableActors();
             entity.setKey(StringArgumentType.getString(command,"Key"));
             entity.moveTo(
                         Vec3Argument.getVec3(command, "Coordinates").x,
@@ -55,13 +53,8 @@ public class InitActorCommand {
                 throw ERROR_DUPLICATE_UUID.create();
             } else {
                 stack.sendSuccess(Component.translatable("commands.summon.success", entity.getDisplayName()), true);
-                registerNewActor(entity,StringArgumentType.getString(command,"Key"));
                 return 1;
             }
         }
-    }
-    private void registerNewActor(ActorNPC actor, String key){
-//        NPCMapper.addListed(key,actor);
-        NPCMapper.availableActors();
     }
 }

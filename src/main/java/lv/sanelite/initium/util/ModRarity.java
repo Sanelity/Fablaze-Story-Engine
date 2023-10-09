@@ -1,4 +1,4 @@
-package lv.sanelite.initium.rarity;
+package lv.sanelite.initium.util;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.Rarity;
