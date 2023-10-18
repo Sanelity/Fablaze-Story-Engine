@@ -6,15 +6,14 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import lv.sanelite.initium.entity.custom.ActorNPC;
-import lv.sanelite.initium.entity.custom.NPCMapper;
+//import lv.sanelite.initium.entity.custom.ActorNPC;
+//import lv.sanelite.initium.entity.custom.NPCMapper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
 
 public class ActorCommand {
     public ActorCommand(CommandDispatcher<CommandSourceStack> dispatcher){
@@ -39,21 +38,22 @@ public class ActorCommand {
             .executes(this::eliminate))));                                                       //Execute
     }
     public int listing(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        return NPCMapper.availableActors();
+//        return NPCMapper.availableActors();
+        return 0;
     }
     public int eliminate(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        Entity killable = getEntity(StringArgumentType.getString(command, "Name"));
-        killable.kill();
-        NPCMapper.delListed(StringArgumentType.getString(command, "Name"));
+//        Entity killable = getEntity(StringArgumentType.getString(command, "Name"));
+//        killable.kill();
+//        NPCMapper.delListed(StringArgumentType.getString(command, "Name"));
         return 1;
     }
     public int resendTarged(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        ActorNPC entity = getEntity(StringArgumentType.getString(command,"Name"));
-        entity.newTarget(
-                Vec3Argument.getVec3(command,"Coordinates"),
-                DoubleArgumentType.getDouble(command,"Speed"),
-                BoolArgumentType.getBool(command, "Bypass")
-        );
+//        ActorNPC entity = getEntity(StringArgumentType.getString(command,"Name"));
+//        entity.newTarget(
+//                Vec3Argument.getVec3(command,"Coordinates"),
+//                DoubleArgumentType.getDouble(command,"Speed"),
+//                BoolArgumentType.getBool(command, "Bypass")
+//        );
 
         if(Minecraft.getInstance().player != null){
             Minecraft.getInstance().player.sendSystemMessage(
@@ -74,15 +74,15 @@ public class ActorCommand {
     }
 
     public int setVisibility(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        ActorNPC entity = getEntity(StringArgumentType.getString(command,"Name"));
-        entity.setCustomNameVisible(BoolArgumentType.getBool(command, "Boolean"));
+//        ActorNPC entity = getEntity(StringArgumentType.getString(command,"Name"));
+//        entity.setCustomNameVisible(BoolArgumentType.getBool(command, "Boolean"));
         return 1;
     }
-    private ActorNPC getEntity(String key){
-        return NPCMapper.getActor(key);
-
+//    private ActorNPC getEntity(String key){
+//        return NPCMapper.getActor(key);
+//
 
 //        int id = NPCMapper.keyID.get(key);
 //        return NPCMapper.entityKeyed.get(id);
-    }
+//    }
 }
