@@ -11,8 +11,8 @@ CURR    - Custom Targeting
 
 DONE    - Memory saving system
 DONE    - Access mapping
+DONE    - TRANSFERED TO AZURELIB
 CURR    - Selective model/texture
-        - Azure vs TimeCore (Current GeckoLib3, Recommended TimeCore)
             ADVANCED LOW PRIORITY
             - Customizble behavior
 
@@ -24,8 +24,15 @@ CURR    - Simple Actor type
             - Trade Actor type
             - Quest Actor type
 
+    Quest items/blocks:
+DONE    - Simple items and Blocks
+CURR    - Animated items
+CURR    - Animated Blocks
+        - Animated tile blocks
+
     Actor visuals:
 DONE    - Custom text colors
+DONE    - Actor Glowing
         LOW PRIORITY
         - Particle system
                 * Visibile Range
@@ -42,6 +49,7 @@ SOON    - Black screen or Hex color
 
     Scripting/Story engine:
 SOON    - Reading command sequence through the script file (JavaScript)
+        - Custom screens
         - Dialog screen (Non - MC button)[Up to 5 anwsers]
 
             ADVANCED LOW PRIORITY
