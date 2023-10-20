@@ -6,8 +6,18 @@ import mod.azure.azurelib.core.animation.AnimatableManager;
 import mod.azure.azurelib.core.animation.AnimationController;
 import mod.azure.azurelib.core.animation.RawAnimation;
 import mod.azure.azurelib.util.AzureLibUtil;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -17,13 +27,20 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class AzureNPC extends PathfinderMob implements GeoEntity {
     private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
 
-    public AzureNPC(EntityType<? extends PathfinderMob> entityType, Level level) {
+    public AzureNPC(EntityType<? extends AzureNPC> entityType, Level level) {
         super(entityType, level);
+        if(!level.isClientSide()){
+            NPCMapper.addListed(KEY,this);
+        }
     }
+
+                                ///  -   -   -   ANIMATIONS  -   -   -   ///
 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
@@ -68,8 +85,157 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
+                                    ///  -   -   -   LOGICS  -   -   -   ///
+
+        //Moving logic
+    public void reachLogic(){
+        if(ACTIVE && (Math.abs(new Vec3(xo,yo,zo).subtract(TARGET).length()) <= ENTER)){
+            setActivity(false);
+        }else if(Math.abs(new Vec3(xo,yo,zo).subtract(TARGET).length()) >= LEAVE){
+            setActivity(true);
+            moveToTarget();
+        }
+    }
+    public void setCurrentAsTarget(){
+        TARGET = new Vec3(xOld, yOld, zOld);
+    }
+    public void newTarget(Vec3 direction, double speed, boolean bypass){
+        setActivity(true);
+        TARGET = direction; this.SPEED = speed; this.BYPASS = bypass;
+    }
+    public void moveToTarget(){
+        this.getNavigation().moveTo(TARGET.x, TARGET.y, TARGET.z, SPEED);
+    }
+
+        //Interaction
+    public boolean tracking = false;
+
+    @Override
+    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
+        if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
+
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal("[???]").setStyle(color)
+                    .append(Component.literal(" Hello! My name is " + this.KEY).withStyle(ChatFormatting.WHITE)));
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(color)
+                    .append(Component.literal(" I am an Actor, and waiting for my script!").withStyle(ChatFormatting.WHITE)));
+
+            tracking = true;
+        }else{
+            if(tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
+                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Tracking turned off"));
+                tracking = false;
+            }
+        }
+        return InteractionResult.PASS;
+    }
+
+        //Data
+
+    String KEY = String.valueOf(this.getId());
+    Vec3 TARGET = new Vec3(0,0,0);
+    Double SPEED = 1.0d;
+    Double ENTER = 0.5d;
+    Double LEAVE = 1.5d;
+
+    Boolean ACTIVE = true;
+    Boolean BYPASS = false;
+    Boolean INITIALIZED = false;
+
+    Style color = Style.EMPTY.withColor(16711842).withInsertion("st");
+
+    public void setActivity(boolean state){
+        this.ACTIVE = state;
+    }
+    public void setKey(String name){
+        this.KEY = name;
+    }
+
+    @Override
+    public void load(CompoundTag compoundTag) {
+        super.load(compoundTag);
+        this.KEY = compoundTag.getString("key");
+        this.SPEED = compoundTag.getDouble("speed");
+        this.ENTER = compoundTag.getDouble("enter");
+        this.LEAVE = compoundTag.getDouble("leave");
+
+        this.INITIALIZED = compoundTag.getBoolean("initialized");
+        this.BYPASS = compoundTag.getBoolean("bypass");
+
+        this.TARGET = new Vec3(
+                compoundTag.getDouble("x"),
+                compoundTag.getDouble("y"),
+                compoundTag.getDouble("z")
+        );
+    }
+
+    @Override
+    public boolean save(CompoundTag compoundTag) {
+        compoundTag.putBoolean("initialized", this.INITIALIZED);
+        compoundTag.putBoolean("bypass", this.BYPASS);
+
+        compoundTag.putString("key", this.KEY);
+        compoundTag.putDouble("speed", this.SPEED);
+        compoundTag.putDouble("enter", this.ENTER);
+        compoundTag.putDouble("leave", this.LEAVE);
+
+        compoundTag.putDouble("x",this.TARGET.x);
+        compoundTag.putDouble("y",this.TARGET.y);
+        compoundTag.putDouble("z",this.TARGET.z);
+
+        return super.save(compoundTag);
+    }
+
+
+    private int initCounter = 0;
+        public boolean isInitialized(){
+        return this.getPersistentData().getBoolean("initialized");
+
+    }
+
     @Override
     public void aiStep() {
         super.aiStep();
+
+        if(initCounter < 10) initCounter++;
+        else{
+            if(!isInitialized()){
+                if(!level.isClientSide() && !String.valueOf(this.getId()).equals(this.KEY)){
+                    NPCMapper.rename(this.getId(), this.KEY);
+                }else INITIALIZED = true;
+
+            }
+            if(!BYPASS && TARGET.equals(Vec3.ZERO)) setCurrentAsTarget();
+            if(!isAlive()){
+                NPCMapper.delListed(this.KEY);
+            }
+            initCounter = 0;
+        }
+
+        if(this.tickCount % 20 == 0 ){
+            if(Minecraft.getInstance().player != null && tracking){
+                tracker();
+            }
+            reachLogic();
+        }
     }
+
+        //Debugging
+    public void tracker(){
+        Minecraft.getInstance().player.sendSystemMessage(Component.literal
+                        ("Current: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | " + this.KEY)
+                .withStyle(ChatFormatting.RED));
+        Minecraft.getInstance().player.sendSystemMessage(Component.literal
+                        ("Target: " + Math.round(TARGET.x) + " " + Math.round(TARGET.y) + " " + Math.round(TARGET.z))
+                .withStyle(ChatFormatting.GOLD));
+    }
+
+
+        //Sounds
+    protected void playStepSound(BlockPos pos, BlockState state){
+        this.playSound(SoundEvents.AXOLOTL_ATTACK, 0.15f, 1.0f);
+    }
+    protected SoundEvent getAmbientSound(){ return SoundEvents.CAT_STRAY_AMBIENT;}
+    protected SoundEvent getHurtSound(DamageSource damageSourceIn){ return SoundEvents.CAT_HURT;}
+    protected SoundEvent getDeathSound(){return SoundEvents.CAT_DEATH;}
+    protected float getSoundVolume(){return 0.25f;}
 }

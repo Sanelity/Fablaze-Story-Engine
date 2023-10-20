@@ -5,11 +5,10 @@ import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.block.ModBlocks;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.ModVillager;
-//import lv.sanelite.initium.entity.custom.ActorNPC;
 import lv.sanelite.initium.entity.custom.AzureNPC;
 import lv.sanelite.initium.item.ModItems;
 import lv.sanelite.initium.util.ActorCommand;
-//import lv.sanelite.initium.util.InitActorCommand;
+import lv.sanelite.initium.util.InitActorCommand;
 import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,7 +27,7 @@ public class ModEvents {
         @SubscribeEvent
         public static void onCommandsRegister(RegisterCommandsEvent event){
             new ActorCommand(event.getDispatcher());
-//            new InitActorCommand(event.getDispatcher());
+            new InitActorCommand(event.getDispatcher());
         }
 
 
@@ -67,7 +66,6 @@ public class ModEvents {
     public static class ModEventBusEvents{
         @SubscribeEvent
         public static void entityAttributeEvent(EntityAttributeCreationEvent event){
-//            event.put(ModEntityTypes.ACTOR.get(), ActorNPC.setAttributes());
             event.put(ModEntityTypes.AZURE.get(), AzureNPC.setAttributes());
 
         }

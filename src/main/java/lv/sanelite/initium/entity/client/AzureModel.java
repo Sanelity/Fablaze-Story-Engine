@@ -3,7 +3,6 @@ package lv.sanelite.initium.entity.client;
 import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.entity.custom.AzureNPC;
 import mod.azure.azurelib.constant.DataTickets;
-import mod.azure.azurelib.core.animatable.GeoAnimatable;
 import mod.azure.azurelib.core.animatable.model.CoreGeoBone;
 import mod.azure.azurelib.core.animation.AnimationState;
 import mod.azure.azurelib.model.GeoModel;
@@ -39,4 +38,5 @@ public class AzureModel extends GeoModel<AzureNPC> {
     public ResourceLocation getAnimationResource(AzureNPC geoAnimatable) {
         return new ResourceLocation(Initium.MOD_ID, "animations/sentry.animation.json");
     }
+
 }

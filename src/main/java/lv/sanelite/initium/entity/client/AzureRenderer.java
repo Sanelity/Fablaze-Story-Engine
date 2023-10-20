@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 public class AzureRenderer extends GeoEntityRenderer<AzureNPC> {
     public AzureRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new AzureModel());
+        withScale(0.9f);
 
         addRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
