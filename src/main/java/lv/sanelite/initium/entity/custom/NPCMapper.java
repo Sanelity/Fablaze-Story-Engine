@@ -3,13 +3,9 @@ package lv.sanelite.initium.entity.custom;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-
-
-
 import java.util.*;
 
 public class NPCMapper {
-
     public static Map<String, AzureNPC> actorMap = new HashMap<>();
 
     public static void addListed(String key, AzureNPC actor){
