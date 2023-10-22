@@ -4,7 +4,7 @@ import lv.sanelite.initium.entity.custom.NPCMapper;
 import net.minecraftforge.event.level.LevelEvent;
 
 public class ModForgeEvent {
-    public static void onLoad(LevelEvent.Load e){
+    public static void onUnload(LevelEvent.Unload e){
         NPCMapper.actorMap.clear();
     }
 }
