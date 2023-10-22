@@ -16,7 +16,6 @@ import mod.azure.azurelib.AzureLib;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -50,7 +49,7 @@ public class Initium {
         AzureLib.initialize();
 
         modEventBus.addListener(this::commonSetup);
-        forgebus.addListener(ModForgeEvent::onLoad);
+        forgebus.addListener(ModForgeEvent::onUnload);
         forgebus.register(this);
 
     }
