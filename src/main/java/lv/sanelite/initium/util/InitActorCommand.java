@@ -28,7 +28,8 @@ public class InitActorCommand {
             .then(Commands.literal("new")
             .then(Commands.argument("Coordinates", Vec3Argument.vec3())
             .then(Commands.argument("Key",StringArgumentType.word())
-            .executes((command) -> summonKeyedActor(command.getSource(), command))))));
+            .then(Commands.argument("Character",StringArgumentType.word())
+            .executes((command) -> summonKeyedActor(command.getSource(), command)))))));
     }
 
     private int summonKeyedActor(CommandSourceStack stack, CommandContext command) throws CommandSyntaxException {
@@ -39,6 +40,7 @@ public class InitActorCommand {
             ServerLevel serverlevel = stack.getLevel();
 
             AzureNPC entity = new AzureNPC(ModEntityTypes.AZURE.get(), serverlevel);
+            entity.setResource(StringArgumentType.getString(command, "Character"));
             entity.setKey(StringArgumentType.getString(command,"Key"));
             entity.moveTo(
                         Vec3Argument.getVec3(command, "Coordinates").x,

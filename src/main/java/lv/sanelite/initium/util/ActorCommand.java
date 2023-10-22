@@ -29,6 +29,11 @@ public class ActorCommand {
 
             .then(Commands.literal("list").executes(this::listing))                     // - /actor list = Execute
 
+            .then(Commands.literal("change")
+            .then(Commands.argument("Name", StringArgumentType.word())
+            .then(Commands.argument("Resource", StringArgumentType.word())
+            .executes(this::changeRes))))
+
             .then(Commands.literal("name")                                              // - /actor name ...
             .then(Commands.argument("Name",StringArgumentType.word())                   // - /actor name "Name" ...
             .then(Commands.argument("Boolean", BoolArgumentType.bool())                 // - /actor name "Name" "Boolean"
@@ -38,6 +43,12 @@ public class ActorCommand {
             .then(Commands.argument("Name", StringArgumentType.word())                  // - /actor eliminate "Name" ...
             .executes(this::eliminate))));                                                       //Execute
     }
+    public int changeRes(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
+        AzureNPC entity = getEntity(StringArgumentType.getString(command, "Name"));
+        entity.setResource(StringArgumentType.getString(command, "Resource"));
+        return 1;
+    }
+
     public int listing(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
         return NPCMapper.availableActors();
     }

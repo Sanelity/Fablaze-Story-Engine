@@ -12,6 +12,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -40,6 +43,9 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         }
     }
 
+
+    //TODO - CHARACTER ENUM
+
                                 ///  -   -   -   ANIMATIONS  -   -   -   ///
 
     @Override
@@ -49,13 +55,13 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controllerName", 4, event ->
+        controllers.add(new AnimationController<>(this, "controller", 4, event ->
         {
             return event.setAndContinue(
                     // If moving, play the walking animation
-                    event.isMoving() ? RawAnimation.begin().thenLoop("sentry.walk.animation"):
+                    event.isMoving() ? RawAnimation.begin().thenLoop("walk.animation"):
                             // If not moving, play the idle animation
-                            RawAnimation.begin().thenLoop("sentry.idle.animation"));
+                            RawAnimation.begin().thenLoop("idle.animation"));
         })
                 // Sets a Sound KeyFrame
                 .setSoundKeyframeHandler(event -> {
@@ -131,7 +137,8 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
 
         //Data
 
-    String KEY = String.valueOf(this.getId());
+    public String KEY = String.valueOf(this.getId());
+    String RESOURCE = "maxie";
     Vec3 TARGET = new Vec3(0,0,0);
     Double SPEED = 1.0d;
     Double ENTER = 0.5d;
@@ -141,13 +148,19 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
     Boolean BYPASS = false;
     Boolean INITIALIZED = false;
 
-    Style color = Style.EMPTY.withColor(16711842).withInsertion("st");
+    Style color = Style.EMPTY.withColor(16711842);
 
     public void setActivity(boolean state){
         this.ACTIVE = state;
     }
     public void setKey(String name){
         this.KEY = name;
+    }
+    public void setResource(String res){
+        this.RESOURCE = res;
+    }
+    public String getResource(){
+        return this.RESOURCE;
     }
 
     @Override
@@ -166,6 +179,8 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
                 compoundTag.getDouble("y"),
                 compoundTag.getDouble("z")
         );
+
+        this.RESOURCE = compoundTag.getString("resource");
     }
 
     @Override
@@ -178,9 +193,11 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         compoundTag.putDouble("enter", this.ENTER);
         compoundTag.putDouble("leave", this.LEAVE);
 
-        compoundTag.putDouble("x",this.TARGET.x);
-        compoundTag.putDouble("y",this.TARGET.y);
-        compoundTag.putDouble("z",this.TARGET.z);
+        compoundTag.putDouble("x", this.TARGET.x);
+        compoundTag.putDouble("y", this.TARGET.y);
+        compoundTag.putDouble("z", this.TARGET.z);
+
+        compoundTag.putString("resource", this.RESOURCE);
 
         return super.save(compoundTag);
     }
@@ -188,8 +205,9 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
 
     private int initCounter = 0;
         public boolean isInitialized(){
-        return this.getPersistentData().getBoolean("initialized");
-
+            if(!this.INITIALIZED){
+                return this.getPersistentData().getBoolean("initialized");
+            }else return this.INITIALIZED;
     }
 
     @Override
@@ -222,7 +240,7 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         //Debugging
     public void tracker(){
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                        ("Current: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | " + this.KEY)
+                        ("Current: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | " + this.KEY + this.getId())
                 .withStyle(ChatFormatting.RED));
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
                         ("Target: " + Math.round(TARGET.x) + " " + Math.round(TARGET.y) + " " + Math.round(TARGET.z))

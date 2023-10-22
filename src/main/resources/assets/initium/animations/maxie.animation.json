@@ -765,7 +765,7 @@
 				}
 			}
 		},
-		"swipe.animation": {
+		"wipe.animation": {
 			"animation_length": 0.29167,
 			"override_previous_animation": true,
 			"bones": {

@@ -15,7 +15,6 @@ public class AzureModel extends GeoModel<AzureNPC> {
     @Override
     public void setCustomAnimations(AzureNPC animatable, long instanceId, AnimationState<AzureNPC> animationState) {
         super.setCustomAnimations(animatable, instanceId, animationState);
-
         final CoreGeoBone head = getAnimationProcessor().getBone("head");
         final EntityModelData extraData = animationState.getData(DataTickets.ENTITY_MODEL_DATA);
         if (head != null) {
@@ -24,19 +23,43 @@ public class AzureModel extends GeoModel<AzureNPC> {
         }
     }
 
+
     @Override
     public ResourceLocation getModelResource(AzureNPC geoAnimatable) {
-        return new ResourceLocation(Initium.MOD_ID, "geo/sentry.geo.json");
+        //return new ResourceLocation(Initium.MOD_ID, "geo/sentry.geo.json");
+        return locate("geo", geoAnimatable.getResource());
     }
 
     @Override
     public ResourceLocation getTextureResource(AzureNPC geoAnimatable) {
-        return new ResourceLocation(Initium.MOD_ID, "textures/entity/sentrytexture.png");
+        //return new ResourceLocation(Initium.MOD_ID, "textures/entity/sentry.png");
+        return locate("textures", geoAnimatable.getResource());
     }
 
     @Override
     public ResourceLocation getAnimationResource(AzureNPC geoAnimatable) {
-        return new ResourceLocation(Initium.MOD_ID, "animations/sentry.animation.json");
+        //return new ResourceLocation(Initium.MOD_ID, "animations/sentry.animation.json");
+        return locate("animations", geoAnimatable.getResource());
+    }
+
+    //TODO - MODEL RESOURCE SWITCH CLASS
+
+    public ResourceLocation locate(String type,String instance){
+        switch (type) {
+            case "geo" -> {
+                return new ResourceLocation(Initium.MOD_ID, "geo/" + instance + ".geo.json");
+            }
+            case "textures" -> {
+                return new ResourceLocation(Initium.MOD_ID, "textures/entity/" + instance + ".png");
+            }
+            case "animations" -> {
+                return new ResourceLocation(Initium.MOD_ID, "animations/" + instance + ".animation.json");
+            }
+            default -> {
+                return null;
+            }
+        }
+
     }
 
 }
