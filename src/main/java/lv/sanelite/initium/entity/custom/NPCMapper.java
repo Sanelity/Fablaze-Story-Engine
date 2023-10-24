@@ -37,9 +37,7 @@ public class NPCMapper {
         return actorMap.get(key);
     }
     public static boolean contains(AzureNPC actor){
-        if(actorMap.containsValue(actor)){
-            return true;
-        }else return false;
+        return actorMap.containsValue(actor);
     }
 
 
