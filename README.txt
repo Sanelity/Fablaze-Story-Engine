@@ -61,6 +61,11 @@ SOON    - Reading command sequence through the script file (JavaScript)
             - Quest mechanics
             - Journal
 
+    Story engine GUI/ Interactive Interface:
+        - Story status (Adventure mode: Act 1 - quest)
+        - Continue button hint
+        - To checkpoint button hint
+
     Sound engine:
         - Zoned sounds
         - Multilayer zone system
