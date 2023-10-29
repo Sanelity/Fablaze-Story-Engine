@@ -12,14 +12,26 @@ CURR    - Custom Targeting
 DONE    - Memory saving system
 DONE    - Access mapping
 DONE    - TRANSFERED TO AZURELIB
-CURR    - Selective model/texture
+DONE    - Selective model/texture
             ADVANCED LOW PRIORITY
             - Customizble behavior
 
     Actor types:
-CURR    - Simple Actor type
+DONE    - Simple Actor type
         - Enemy Actor type
-        - Abstract actor type (Simplification)
+CURR    - Abstract actor type (Simplification)
+                                                        |  --> DefaultEnemy, GlowingEnemy
+                                                        |
+                AzureNPC ->(Change to)-> IAzureNPC =>=  | CURR DefaultActor, GlowingActor
+                                                        |
+                                                        |  --> DefaultTrader, GlowingTrader
+                                                        |
+                                                        |  --> QuestActor, GlowingQuestActor
+
+                                        + IBossNPC =>=  |  --> StrongEnemy, GlowingStrongEnemy
+                                                        |
+                                                        |  --> BossCreature, GlowingBoss
+
             ADVANCED LOW PRIORITY
             - Trade Actor type
             - Quest Actor type
@@ -42,7 +54,7 @@ DONE    - Actor Glowing
                 * Magic/Visuals
 
     Rendering features:
-SOON    - Black screen or Hex color
+CURR    - Black screen or Hex color
         - Screen fading to Hex color
             ADVANCED LOW PRIORITY
             - Video sequence importing
