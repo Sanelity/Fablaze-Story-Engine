@@ -1,7 +1,8 @@
 package lv.sanelite.initium.entity.client;
 
 import lv.sanelite.initium.Initium;
-import lv.sanelite.initium.entity.custom.AzureNPC;
+import lv.sanelite.initium.entity.actor.AzureNPC;
+import lv.sanelite.initium.entity.dataset.Character;
 import mod.azure.azurelib.constant.DataTickets;
 import mod.azure.azurelib.core.animatable.model.CoreGeoBone;
 import mod.azure.azurelib.core.animation.AnimationState;
@@ -12,6 +13,29 @@ import net.minecraft.util.Mth;
 
 public class AzureModel extends GeoModel<AzureNPC> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
+
+    @Override
+    public ResourceLocation getModelResource(AzureNPC geoAnimatable) {
+//        return locate("geo", Character.getCharacter(geoAnimatable.getThisCharacter()).getModel());
+        return new ResourceLocation(Initium.MOD_ID, "geo/" + Character.getCharacter(geoAnimatable.getThisCharacter()).getModel());
+//        return new ResourceLocation(Initium.MOD_ID, "geo/sentry.geo.json");
+    }
+
+    @Override
+    public ResourceLocation getTextureResource(AzureNPC geoAnimatable) {
+
+//        return locate("textures", Character.getCharacter(geoAnimatable.getThisCharacter()).getName());
+        return new ResourceLocation(Initium.MOD_ID, "textures/entity/" + Character.getCharacter(geoAnimatable.getThisCharacter()).getName() + ".png");
+//        return new ResourceLocation(Initium.MOD_ID, "textures/entity/sentry.png");
+    }
+
+    @Override
+    public ResourceLocation getAnimationResource(AzureNPC geoAnimatable) {
+//        return locate("animations", Character.getCharacter(geoAnimatable.getThisCharacter()).getAnimation());
+        return  new ResourceLocation(Initium.MOD_ID, "animations/" + Character.getCharacter(geoAnimatable.getThisCharacter()).getAnimation());
+//        return new ResourceLocation(Initium.MOD_ID, "animations/sanelite.animation.json");
+    }
+
     @Override
     public void setCustomAnimations(AzureNPC animatable, long instanceId, AnimationState<AzureNPC> animationState) {
         super.setCustomAnimations(animatable, instanceId, animationState);
@@ -22,44 +46,4 @@ public class AzureModel extends GeoModel<AzureNPC> {
             head.setRotY(extraData.netHeadYaw() * Mth.DEG_TO_RAD);
         }
     }
-
-
-    @Override
-    public ResourceLocation getModelResource(AzureNPC geoAnimatable) {
-        //return new ResourceLocation(Initium.MOD_ID, "geo/sentry.geo.json");
-        return locate("geo", geoAnimatable.getResource());
-    }
-
-    @Override
-    public ResourceLocation getTextureResource(AzureNPC geoAnimatable) {
-        //return new ResourceLocation(Initium.MOD_ID, "textures/entity/sentry.png");
-        return locate("textures", geoAnimatable.getResource());
-    }
-
-    @Override
-    public ResourceLocation getAnimationResource(AzureNPC geoAnimatable) {
-        //return new ResourceLocation(Initium.MOD_ID, "animations/sentry.animation.json");
-        return locate("animations", geoAnimatable.getResource());
-    }
-
-    //TODO - MODEL RESOURCE SWITCH CLASS
-
-    public ResourceLocation locate(String type,String instance){
-        switch (type) {
-            case "geo" -> {
-                return new ResourceLocation(Initium.MOD_ID, "geo/" + instance + ".geo.json");
-            }
-            case "textures" -> {
-                return new ResourceLocation(Initium.MOD_ID, "textures/entity/" + instance + ".png");
-            }
-            case "animations" -> {
-                return new ResourceLocation(Initium.MOD_ID, "animations/" + instance + ".animation.json");
-            }
-            default -> {
-                return null;
-            }
-        }
-
-    }
-
 }

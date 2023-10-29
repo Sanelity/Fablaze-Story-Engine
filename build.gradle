@@ -5,7 +5,7 @@ plugins {
     id 'org.spongepowered.mixin' version '0.7.+'
 }
 
-version = '0.1.0-1.19.2'
+version = '0.1.1-1.19.2'
 group = 'lv.sanelite.initium' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'initium'
 

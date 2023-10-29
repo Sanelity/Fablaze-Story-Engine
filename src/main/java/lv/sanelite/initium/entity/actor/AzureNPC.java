@@ -1,5 +1,8 @@
-package lv.sanelite.initium.entity.custom;
+package lv.sanelite.initium.entity.actor;
 
+import lv.sanelite.initium.entity.dataset.Character;
+import lv.sanelite.initium.entity.dataset.NPCMapper;
+import lv.sanelite.initium.util.RGB;
 import mod.azure.azurelib.animatable.GeoEntity;
 import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
 import mod.azure.azurelib.core.animation.AnimatableManager;
@@ -18,11 +21,14 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
@@ -30,8 +36,10 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class AzureNPC extends PathfinderMob implements GeoEntity {
     private final AnimatableInstanceCache cache = AzureLibUtil.createInstanceCache(this);
@@ -42,9 +50,6 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
             NPCMapper.addListed(KEY,this);
         }
     }
-
-
-    //TODO - CHARACTER ENUM
 
                                 ///  -   -   -   ANIMATIONS  -   -   -   ///
 
@@ -91,7 +96,30 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
-                                    ///  -   -   -   LOGICS  -   -   -   ///
+    @Nullable
+    @Override
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor serverLevelAccessor, DifficultyInstance difficultyInstance,
+                                        MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData, @Nullable CompoundTag initData) {
+        if(spawnType == MobSpawnType.COMMAND){
+            setCharacter(initData.getString("Character"));
+            setKey(initData.getString("Key"));
+            setColor(Character.getCharacter(initData.getString("Character")).getColor());
+
+
+        }
+        return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, spawnType, spawnGroupData, initData);
+    }
+
+    public static final EntityDataAccessor<String> DATA_CHARACTER =
+            SynchedEntityData.defineId(AzureNPC.class, EntityDataSerializers.STRING);
+
+    @Override
+    protected void defineSynchedData(){
+        super.defineSynchedData();
+        this.entityData.define(DATA_CHARACTER, getPersistentData().getString("character"));
+    }
+
+    ///  -   -   -   LOGICS  -   -   -   ///
 
         //Moving logic
     public void reachLogic(){
@@ -120,9 +148,9 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
         if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
 
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal("[???]").setStyle(color)
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal("[???]").setStyle(COLOR)
                     .append(Component.literal(" Hello! My name is " + this.KEY).withStyle(ChatFormatting.WHITE)));
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(color)
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(COLOR)
                     .append(Component.literal(" I am an Actor, and waiting for my script!").withStyle(ChatFormatting.WHITE)));
 
             tracking = true;
@@ -135,10 +163,17 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         return InteractionResult.PASS;
     }
 
+    public void talk(String msg){
+        if(!level.isClientSide() && Minecraft.getInstance().player != null){
+            Minecraft.getInstance().player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(COLOR)
+                    .append(Component.literal(" " + msg).withStyle(ChatFormatting.WHITE)));
+        }
+    }
+
         //Data
 
     public String KEY = String.valueOf(this.getId());
-    String RESOURCE = "maxie";
+    String CHARACTER = "default";
     Vec3 TARGET = new Vec3(0,0,0);
     Double SPEED = 1.0d;
     Double ENTER = 0.5d;
@@ -148,7 +183,7 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
     Boolean BYPASS = false;
     Boolean INITIALIZED = false;
 
-    Style color = Style.EMPTY.withColor(16711842);
+    Style COLOR = Style.EMPTY.withColor(RGB.color(255,255,255));
 
     public void setActivity(boolean state){
         this.ACTIVE = state;
@@ -156,16 +191,27 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
     public void setKey(String name){
         this.KEY = name;
     }
-    public void setResource(String res){
-        this.RESOURCE = res;
+    public void setColor(int textcolor){
+        this.COLOR = Style.EMPTY.withColor(textcolor);
     }
-    public String getResource(){
-        return this.RESOURCE;
+    public int getColor(){
+        return Character.getCharacter(getThisCharacter()).getColor();
+    }
+
+    public String getThisCharacter(){
+        return this.entityData.get(DATA_CHARACTER);
+    }
+    public void setCharacter(String character){
+        this.CHARACTER = character;
+        this.entityData.set(DATA_CHARACTER, Character.getCharacter(character).getName());
     }
 
     @Override
-    public void load(CompoundTag compoundTag) {
-        super.load(compoundTag);
+    public void readAdditionalSaveData(CompoundTag compoundTag) {
+        super.readAdditionalSaveData(compoundTag);
+        this.CHARACTER = compoundTag.getString("character");
+        this.entityData.set(DATA_CHARACTER, compoundTag.getString("character"));
+
         this.KEY = compoundTag.getString("key");
         this.SPEED = compoundTag.getDouble("speed");
         this.ENTER = compoundTag.getDouble("enter");
@@ -174,17 +220,20 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         this.INITIALIZED = compoundTag.getBoolean("initialized");
         this.BYPASS = compoundTag.getBoolean("bypass");
 
+        setColor( compoundTag.getInt("color"));
+
         this.TARGET = new Vec3(
                 compoundTag.getDouble("x"),
                 compoundTag.getDouble("y"),
                 compoundTag.getDouble("z")
         );
-
-        this.RESOURCE = compoundTag.getString("resource");
     }
 
     @Override
-    public boolean save(CompoundTag compoundTag) {
+    public void addAdditionalSaveData(CompoundTag compoundTag) {
+        super.addAdditionalSaveData(compoundTag);
+        compoundTag.putString("character", this.CHARACTER);
+
         compoundTag.putBoolean("initialized", this.INITIALIZED);
         compoundTag.putBoolean("bypass", this.BYPASS);
 
@@ -193,13 +242,12 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         compoundTag.putDouble("enter", this.ENTER);
         compoundTag.putDouble("leave", this.LEAVE);
 
+        compoundTag.putInt("color", getColor());
+
         compoundTag.putDouble("x", this.TARGET.x);
         compoundTag.putDouble("y", this.TARGET.y);
         compoundTag.putDouble("z", this.TARGET.z);
 
-        compoundTag.putString("resource", this.RESOURCE);
-
-        return super.save(compoundTag);
     }
 
 
@@ -207,7 +255,7 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         public boolean isInitialized(){
             if(!this.INITIALIZED){
                 return this.getPersistentData().getBoolean("initialized");
-            }else return this.INITIALIZED;
+            }else return true;
     }
 
     @Override

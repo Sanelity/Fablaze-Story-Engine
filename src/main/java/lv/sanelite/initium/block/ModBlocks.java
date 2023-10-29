@@ -6,7 +6,7 @@ import lv.sanelite.initium.block.advanced.BouncerBlock;
 import lv.sanelite.initium.block.advanced.UraniumLamp;
 import lv.sanelite.initium.item.ModCreativeModeTab;
 import lv.sanelite.initium.item.ModItems;
-import lv.sanelite.initium.util.ModRarity;
+import lv.sanelite.initium.util.SaneliteRarity;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -54,14 +54,14 @@ public class ModBlocks {
                     .Properties.of(Material.SPONGE)
                     .strength(1f)
                     .lightLevel(BlockState -> 12)),
-                    ModCreativeModeTab.INITIUM_TAB, ModRarity.LEGENDARY);
+                    ModCreativeModeTab.INITIUM_TAB, SaneliteRarity.LEGENDARY);
 
     public static final  RegistryObject<Block> URANIUM_LAMP =
             registerBlock("uranium_lamp", () -> new UraniumLamp(BlockBehaviour
                     .Properties.of(Material.GLASS)
                     .strength(1f)
                     .lightLevel(state -> state.getValue(UraniumLamp.LIT)? 15 : 0)),
-                    ModCreativeModeTab.INITIUM_TAB, ModRarity.LEGENDARY);
+                    ModCreativeModeTab.INITIUM_TAB, SaneliteRarity.LEGENDARY);
 
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block, CreativeModeTab tab, Rarity rareness){

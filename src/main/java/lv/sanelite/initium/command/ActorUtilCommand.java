@@ -1,4 +1,4 @@
-package lv.sanelite.initium.util;
+package lv.sanelite.initium.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
@@ -6,8 +6,8 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import lv.sanelite.initium.entity.custom.AzureNPC;
-import lv.sanelite.initium.entity.custom.NPCMapper;
+import lv.sanelite.initium.entity.actor.AzureNPC;
+import lv.sanelite.initium.entity.dataset.NPCMapper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
@@ -16,8 +16,8 @@ import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
-public class ActorCommand {
-    public ActorCommand(CommandDispatcher<CommandSourceStack> dispatcher){
+public class ActorUtilCommand {
+    public ActorUtilCommand(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(Commands.literal("actor")                                   // - /actor ...
 
             .then(Commands.literal("move")                                              // - /actor move
@@ -28,6 +28,11 @@ public class ActorCommand {
             .executes(this::resendTarged))))))                                                   //Execute
 
             .then(Commands.literal("list").executes(this::listing))                     // - /actor list = Execute
+
+            .then(Commands.literal("say")
+            .then(Commands.argument("Name", StringArgumentType.string())
+            .then(Commands.argument("Message", StringArgumentType.string())
+            .executes(this::sendMessage))))
 
             .then(Commands.literal("change")
             .then(Commands.argument("Name", StringArgumentType.word())
@@ -43,9 +48,15 @@ public class ActorCommand {
             .then(Commands.argument("Name", StringArgumentType.word())                  // - /actor eliminate "Name" ...
             .executes(this::eliminate))));                                                       //Execute
     }
+    public int sendMessage(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
+        AzureNPC entity = getEntity(StringArgumentType.getString(command, "Name"));
+        entity.talk(StringArgumentType.getString(command, "Message"));
+        return 1;
+    }
+
     public int changeRes(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
         AzureNPC entity = getEntity(StringArgumentType.getString(command, "Name"));
-        entity.setResource(StringArgumentType.getString(command, "Resource"));
+        entity.setCharacter(StringArgumentType.getString(command, "Resource"));
         return 1;
     }
 

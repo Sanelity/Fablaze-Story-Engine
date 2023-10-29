@@ -4,7 +4,7 @@ import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.item.advanced.AddActorToolItem;
 import lv.sanelite.initium.item.advanced.D6DiceItem;
-import lv.sanelite.initium.util.ModRarity;
+import lv.sanelite.initium.util.SaneliteRarity;
 import net.minecraft.world.item.*;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -34,14 +34,14 @@ public class ModItems {
             ITEMS.register("diced6",() -> new D6DiceItem(new Item.Properties()
                     .stacksTo(1)
                     .tab(ModCreativeModeTab.INITIUM_TAB)
-                    .rarity(ModRarity.MYTHICAL)
+                    .rarity(SaneliteRarity.MYTHICAL)
             )
     );
     public static final RegistryObject<Item> INFINITUM =
             ITEMS.register("infinitum",() -> new SwordItem(Tiers.NETHERITE, 10, 5f, new Item.Properties()
                     .stacksTo(1)
                     .tab(ModCreativeModeTab.INITIUM_TAB)
-                    .rarity(ModRarity.MYTHICAL)
+                    .rarity(SaneliteRarity.MYTHICAL)
                     .durability(4096)
                     )
             );
@@ -50,7 +50,7 @@ public class ModItems {
             ITEMS.register("sentry_spawn_egg",
                     () -> new ForgeSpawnEggItem(ModEntityTypes.AZURE, 0xffffff, 0xc40c40,
                             new Item.Properties().tab(ModCreativeModeTab.INITIUM_TAB)
-                                    .rarity(ModRarity.MYTHICAL)
+                                    .rarity(SaneliteRarity.MYTHICAL)
                                     .stacksTo(64)
                     )
             );
@@ -60,7 +60,7 @@ public class ModItems {
                     () -> new AddActorToolItem(new Item.Properties()
                             .stacksTo(1)
                             .tab(ModCreativeModeTab.INITIUM_TAB)
-                            .rarity(ModRarity.MYTHICAL)
+                            .rarity(SaneliteRarity.MYTHICAL)
                     )
             );
 

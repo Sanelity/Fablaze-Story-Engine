@@ -113,7 +113,7 @@
 //    Boolean BYPASS = false;
 //    Boolean INITIALIZED = false;
 //
-//    Style color = Style.EMPTY.withColor(16711842).withInsertion("st");
+//    Style COLOR = Style.EMPTY.withColor(16711842).withInsertion("st");
 //
 //    @Override
 //    public void load(CompoundTag compoundTag) {
@@ -179,9 +179,9 @@
 //    protected InteractionResult mobInteract(Player player, InteractionHand hand) {
 //        if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
 //
-//            Minecraft.getInstance().player.sendSystemMessage(Component.literal("[???]").setStyle(color)
+//            Minecraft.getInstance().player.sendSystemMessage(Component.literal("[???]").setStyle(COLOR)
 //                    .append(Component.literal(" Hello! My name is " + this.KEY).withStyle(ChatFormatting.WHITE)));
-//            Minecraft.getInstance().player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(color)
+//            Minecraft.getInstance().player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(COLOR)
 //                    .append(Component.literal(" I am an Actor, and waiting for my script!").withStyle(ChatFormatting.WHITE)));
 //
 //            tracking = true;

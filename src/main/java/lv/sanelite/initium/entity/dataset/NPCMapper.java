@@ -1,5 +1,6 @@
-package lv.sanelite.initium.entity.custom;
+package lv.sanelite.initium.entity.dataset;
 
+import lv.sanelite.initium.entity.actor.AzureNPC;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;

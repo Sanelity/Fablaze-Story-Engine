@@ -1,4 +1,4 @@
-package lv.sanelite.initium.util;
+package lv.sanelite.initium.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -6,24 +6,25 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import lv.sanelite.initium.entity.ModEntityTypes;
-import lv.sanelite.initium.entity.custom.AzureNPC;
+import lv.sanelite.initium.entity.actor.AzureNPC;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 
-public class InitActorCommand {
+public class ActorNewCommand {
     private static final SimpleCommandExceptionType ERROR_DUPLICATE_UUID = new SimpleCommandExceptionType(Component.translatable("commands.summon.failed.uuid"));
     private static final SimpleCommandExceptionType INVALID_POSITION = new SimpleCommandExceptionType(Component.translatable("commands.summon.invalidPosition"));
 
     // TODO - Clean up summon code
     // TODO HIGH PRIORITY TASK *** Change SentryNPC class initialization to fit in Keying!!!
 
-    public InitActorCommand(CommandDispatcher<CommandSourceStack> dispatcher){
+    public ActorNewCommand(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(Commands.literal("actor")
             .then(Commands.literal("new")
             .then(Commands.argument("Coordinates", Vec3Argument.vec3())
@@ -38,18 +39,26 @@ public class InitActorCommand {
             throw INVALID_POSITION.create();
         } else {
             ServerLevel serverlevel = stack.getLevel();
+            CompoundTag tag = new CompoundTag();
 
             AzureNPC entity = new AzureNPC(ModEntityTypes.AZURE.get(), serverlevel);
-            entity.setResource(StringArgumentType.getString(command, "Character"));
-            entity.setKey(StringArgumentType.getString(command,"Key"));
+
+//            entity.setCharacter(StringArgumentType.getString(command, "Character"));
+//            entity.setKey(StringArgumentType.getString(command,"Key"));
+
+            tag.putString("Key", StringArgumentType.getString(command,"Key"));
+            tag.putString("Character", StringArgumentType.getString(command,"Character"));
+
             entity.moveTo(
                         Vec3Argument.getVec3(command, "Coordinates").x,
                         Vec3Argument.getVec3(command, "Coordinates").y,
                         Vec3Argument.getVec3(command, "Coordinates").z,
                         entity.getYRot(), entity.getXRot());
 
-            if (!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entity, stack.getLevel(), (float) entity.getX(), (float) entity.getY(), (float) entity.getZ(), null, MobSpawnType.COMMAND))
-                entity.finalizeSpawn(stack.getLevel(), stack.getLevel().getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND,null, null);
+            if (!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entity, stack.getLevel(), (float) entity.getX(), (float) entity.getY(), (float) entity.getZ(), null, MobSpawnType.COMMAND)){
+                entity.finalizeSpawn(stack.getLevel(), stack.getLevel().getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND,null, tag);
+
+            }
 
             if (!serverlevel.tryAddFreshEntityWithPassengers(entity)) {
                 throw ERROR_DUPLICATE_UUID.create();

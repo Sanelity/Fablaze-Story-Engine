@@ -1,6 +1,6 @@
 package lv.sanelite.initium.event;
 
-import lv.sanelite.initium.entity.custom.NPCMapper;
+import lv.sanelite.initium.entity.dataset.NPCMapper;
 import net.minecraftforge.event.level.LevelEvent;
 
 public class ModForgeEvent {
