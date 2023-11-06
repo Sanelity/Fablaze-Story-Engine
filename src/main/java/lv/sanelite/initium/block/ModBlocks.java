@@ -64,6 +64,7 @@ public class ModBlocks {
                     ModCreativeModeTab.INITIUM_TAB, SaneliteRarity.LEGENDARY);
 
 
+
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block, CreativeModeTab tab, Rarity rareness){
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn, tab, rareness);

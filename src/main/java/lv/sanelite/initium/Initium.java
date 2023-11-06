@@ -43,9 +43,8 @@ public class Initium {
         ModConfiguredFeatures.register(modEventBus);
         ModPlacedFeatures.register(modEventBus);
 
-
         ModEntityTypes.register(modEventBus);
-//        GeckoLib.initialize();
+
         AzureLib.initialize();
 
         modEventBus.addListener(this::commonSetup);
