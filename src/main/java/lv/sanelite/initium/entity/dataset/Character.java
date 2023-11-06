@@ -11,7 +11,8 @@ import java.util.Comparator;
 public enum Character {
     SENTRY(0,"sentry", RGB.color(255,0,162), ModelType.SENTRY, AnimationType.SANELITE),
     MAXIE(1, "maxie", RGB.color(0,255,255), ModelType.ANGELOID, AnimationType.SANELITE),
-    MUSKUL(2, "muskul", RGB.color(221, 89, 89), ModelType.ALEX, AnimationType.NPC);
+    MUSKUL(2, "muskul", RGB.color(221, 89, 89), ModelType.ALEX, AnimationType.NPC),
+    BLONDE(3, "blonde", RGB.color(255,255,0), ModelType.ALEX, AnimationType.NPC);
 
     public static final Character[] BY_ID = Arrays.stream(values()).sorted(Comparator
                             .comparingInt(Character::getId)).toArray(Character[]::new);
