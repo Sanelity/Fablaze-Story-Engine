@@ -14,7 +14,7 @@ public class AzureRenderer extends GeoEntityRenderer<AzureNPC> {
         super(renderManager, new AzureModel());
         withScale(0.9f);
 
-            addRenderLayer(new AutoGlowingGeoLayer<>(this));
+        addRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
 
     @Override

@@ -25,16 +25,16 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.SpawnGroupData;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.behavior.LookAtTargetSink;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,8 +47,9 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
     public AzureNPC(EntityType<? extends AzureNPC> entityType, Level level) {
         super(entityType, level);
         if(!level.isClientSide()){
-            NPCMapper.addListed(KEY,this);
+            NPCMapper.addActorToList(KEY,this);
         }
+        this.setPersistenceRequired();
     }
 
                                 ///  -   -   -   ANIMATIONS  -   -   -   ///
@@ -81,7 +82,7 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
     }
 
         public static AttributeSupplier setAttributes (){
-        return Monster.createMonsterAttributes()
+        return AmbientCreature.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 20)
                 .add(Attributes.ATTACK_DAMAGE, 2.0f)
                 .add(Attributes.ATTACK_SPEED, 1.0f)
@@ -92,8 +93,10 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         @Override
     protected void registerGoals(){
         removeFreeWill();
+
+
         this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5f, 1f, false));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
+//        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
     @Nullable
@@ -138,50 +141,70 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         TARGET = direction; this.SPEED = speed; this.BYPASS = bypass;
     }
     public void moveToTarget(){
-        this.getNavigation().moveTo(TARGET.x, TARGET.y, TARGET.z, SPEED);
+        PathNavigation navigator = this.getNavigation();
+
+        if(navigator.isInProgress() && navigator.isStuck()){
+            navigator.recomputePath();
+        }else navigator.moveTo(TARGET.x, TARGET.y, TARGET.z, SPEED);
+
     }
 
         //Interaction
-    public boolean tracking = false;
 
     @Override
     protected InteractionResult mobInteract(Player player, InteractionHand hand) {
-        if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
 
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal("[???]").setStyle(COLOR)
-                    .append(Component.literal(" Hello! My name is " + this.KEY).withStyle(ChatFormatting.WHITE)));
-            Minecraft.getInstance().player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(COLOR)
-                    .append(Component.literal(" I am an Actor, and waiting for my script!").withStyle(ChatFormatting.WHITE)));
+        if(player.isHolding(Items.STICK)){
+            if(!tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
 
-            tracking = true;
-        }else{
-            if(tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND){
-                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Tracking turned off"));
-                tracking = false;
+                player.sendSystemMessage(Component.literal("[???]").setStyle(COLOR)
+                        .append(Component.literal(" Hello! My name is " + this.KEY).withStyle(ChatFormatting.WHITE)));
+                player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(COLOR)
+                        .append(Component.literal(" I am an Actor, and waiting for my script!").withStyle(ChatFormatting.WHITE)));
+
+                tracking = true;
+
+//                Minecraft.getInstance().options.hideGui = true;
+
+            }else{
+                if(tracking && !level.isClientSide() && hand == InteractionHand.MAIN_HAND) {
+                    player.sendSystemMessage(Component.literal("Tracking turned off"));
+                    tracking = false;
+                }
             }
+        }else if(!level.isClientSide() && hand == InteractionHand.MAIN_HAND && isMsgReloaded()) {
+            talk(Character.getCharacter(getThisCharacter()).getPhraseTalk());
         }
-        return InteractionResult.PASS;
+        return InteractionResult.SUCCESS;
     }
+
+
 
     public void talk(String msg){
         if(!level.isClientSide() && Minecraft.getInstance().player != null){
             Minecraft.getInstance().player.sendSystemMessage(Component.literal( "[" + this.KEY + "]").setStyle(COLOR)
                     .append(Component.literal(" " + msg).withStyle(ChatFormatting.WHITE)));
         }
+        setMsgReloaded(false);
     }
 
         //Data
 
-    public String KEY = String.valueOf(this.getId());
+    String KEY = String.valueOf(this.getId());
     String CHARACTER = "default";
     Vec3 TARGET = new Vec3(0,0,0);
-    Double SPEED = 1.0d;
-    Double ENTER = 0.5d;
-    Double LEAVE = 1.5d;
+    double SPEED = 1.0d;
+    double ENTER = 0.5d;
+    double LEAVE = 1.5d;
 
-    Boolean ACTIVE = true;
-    Boolean BYPASS = false;
-    Boolean INITIALIZED = false;
+    boolean ACTIVE = true;
+    boolean BYPASS = false;
+    boolean INITIALIZED = false;
+
+    boolean tracking = false;
+
+    boolean msgReloaded = true;
+
 
     Style COLOR = Style.EMPTY.withColor(RGB.color(255,255,255));
 
@@ -198,13 +221,29 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         return Character.getCharacter(getThisCharacter()).getColor();
     }
 
+    public void setMsgReloaded(boolean msgReloaded) {
+        this.msgReloaded = msgReloaded;
+    }
+    public boolean isMsgReloaded(){
+        return this.msgReloaded;
+    }
+
+    public void setLookTarget(Entity target){
+        this.getLookControl().setLookAt(target);
+    }
+    public void setLookAt(Vec3 pos){
+        this.getLookControl().setLookAt(pos);
+    }
+
     public String getThisCharacter(){
         return this.entityData.get(DATA_CHARACTER);
     }
     public void setCharacter(String character){
         this.CHARACTER = character;
         this.entityData.set(DATA_CHARACTER, Character.getCharacter(character).getName());
+        setColor(Character.getCharacter(character).getColor());
     }
+
 
     @Override
     public void readAdditionalSaveData(CompoundTag compoundTag) {
@@ -266,18 +305,19 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         else{
             if(!isInitialized()){
                 if(!level.isClientSide() && !String.valueOf(this.getId()).equals(this.KEY)){
-                    NPCMapper.rename(this.getId(), this.KEY);
+                    NPCMapper.renameActorInList(this.getId(), this.KEY);
                 }else INITIALIZED = true;
 
             }
             if(!BYPASS && TARGET.equals(Vec3.ZERO)) setCurrentAsTarget();
             if(!isAlive()){
-                NPCMapper.delListed(this.KEY);
+                NPCMapper.deleteActorFromList(this.KEY);
             }
             initCounter = 0;
         }
 
         if(this.tickCount % 20 == 0 ){
+            setMsgReloaded(true);
             if(Minecraft.getInstance().player != null && tracking){
                 tracker();
             }

@@ -10,9 +10,13 @@ import lv.sanelite.initium.event.ModForgeEvent;
 import lv.sanelite.initium.item.ModItems;
 import lv.sanelite.initium.networking.ModMessages;
 import lv.sanelite.initium.painting.ModPaintings;
+import lv.sanelite.initium.screen.ActorAddToolScreen;
+import lv.sanelite.initium.screen.ModMenuTypes;
+import lv.sanelite.initium.screen.SaneliteScreen;
 import lv.sanelite.initium.world.feature.ModConfiguredFeatures;
 import lv.sanelite.initium.world.feature.ModPlacedFeatures;
 import mod.azure.azurelib.AzureLib;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -39,6 +43,8 @@ public class Initium {
         ModBlocks.register(modEventBus);
         ModVillager.register(modEventBus);
         ModPaintings.register(modEventBus);
+
+        ModMenuTypes.register(modEventBus);
 
         ModConfiguredFeatures.register(modEventBus);
         ModPlacedFeatures.register(modEventBus);
@@ -67,6 +73,9 @@ public class Initium {
 
 //            EntityRenderers.register(ModEntityTypes.ACTOR.get(), ActorRenderer::new);
             EntityRenderers.register(ModEntityTypes.AZURE.get(), AzureRenderer::new);
+            MenuScreens.register(ModMenuTypes.SANELITE_SCREEN_MENU.get(), SaneliteScreen::new);
+            MenuScreens.register(ModMenuTypes.ACTOR_ADD_TOOL_MENU.get(), ActorAddToolScreen::new);
+
         }
     }
 }

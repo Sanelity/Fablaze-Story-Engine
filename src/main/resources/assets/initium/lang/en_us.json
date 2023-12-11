@@ -18,6 +18,13 @@
   "entity.minecraft.villager.initium.bounce_master": "Bouncer",
   "entity.initium.azure": "Azure Actor",
 
+  "menu.initium.screen": "Test screen",
+  "menu.initium.actortool": "Actor creating tool",
+  "button.initium.button1": "Super Secret Button",
+  "button.initium.create": "Create",
+  "input.initium.character": "Character asset",
+  "input.initium.actorname": "Name",
+
   "key.category.initium.base": "Initium: Tutorial mod",
   "key.initium.cheat": "Cheat key"
 }

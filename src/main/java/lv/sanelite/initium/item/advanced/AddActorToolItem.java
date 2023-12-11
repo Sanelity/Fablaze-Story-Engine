@@ -1,17 +1,23 @@
 package lv.sanelite.initium.item.advanced;
 
+import lv.sanelite.initium.screen.ActorAddToolMenu;
+import lv.sanelite.initium.screen.ActorAddToolScreen;
+import lv.sanelite.initium.screen.SaneliteScreenMenu;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -22,14 +28,16 @@ public class AddActorToolItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        if(!level.isClientSide() && hand == InteractionHand.MAIN_HAND) {
-            Vec3 vec3 = new Vec3(player.getLookAngle().x, player.getLookAngle().y, player.getLookAngle().z);
-            player.sendSystemMessage(Component.literal(vec3.toString()));
+    public InteractionResultHolder<ItemStack> use(Level level, Player usePlayer, InteractionHand hand) {
 
-            player.getCooldowns().addCooldown(this,5);
+        if(!level.isClientSide() && hand == InteractionHand.MAIN_HAND) {
+            NetworkHooks.openScreen((ServerPlayer) usePlayer, new SimpleMenuProvider(
+                    (containerId, playerInventory, player) -> new ActorAddToolMenu(containerId,playerInventory),
+                    Component.translatable("menu.initium.actortool")
+            ));
+            Minecraft.getInstance().player.getCooldowns().addCooldown(this,5);
         }
-        return super.use(level, player, hand);
+        return super.use(level, usePlayer, hand);
     }
 
     @Override

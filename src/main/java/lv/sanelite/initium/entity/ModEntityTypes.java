@@ -24,7 +24,7 @@ public class ModEntityTypes {
 
     public static final RegistryObject<EntityType<AzureNPC>> AZURE =
             ENTITY_TYPES.register("azure",
-                    () -> EntityType.Builder.of(AzureNPC::new, MobCategory.AMBIENT)
+                    () -> EntityType.Builder.of(AzureNPC::new, MobCategory.CREATURE)
                             .sized(0.4f, 1.8f)
                             .build(new ResourceLocation(Initium.MOD_ID, "azuricsentry").toString()));
 

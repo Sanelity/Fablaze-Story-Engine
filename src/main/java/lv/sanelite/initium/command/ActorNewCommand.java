@@ -15,7 +15,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+
+import static lv.sanelite.initium.core.ActorFunction.createActor;
 
 public class ActorNewCommand {
     private static final SimpleCommandExceptionType ERROR_DUPLICATE_UUID = new SimpleCommandExceptionType(Component.translatable("commands.summon.failed.uuid"));
@@ -34,38 +37,16 @@ public class ActorNewCommand {
     }
 
     private int summonKeyedActor(CommandSourceStack stack, CommandContext command) throws CommandSyntaxException {
-        BlockPos blockpos = new BlockPos(Vec3Argument.getVec3(command, "Coordinates"));
-        if (!Level.isInSpawnableBounds(blockpos)) {
-            throw INVALID_POSITION.create();
-        } else {
-            ServerLevel serverlevel = stack.getLevel();
-            CompoundTag tag = new CompoundTag();
+        Player player = stack.getPlayer();
+        createActor(
+                StringArgumentType.getString(command, "Character"),
+                StringArgumentType.getString(command, "Key"),
+                stack.getLevel(),
+                Vec3Argument.getVec3(command, "Coordinates"));
 
-            AzureNPC entity = new AzureNPC(ModEntityTypes.AZURE.get(), serverlevel);
-
-//            entity.setCharacter(StringArgumentType.getString(command, "Character"));
-//            entity.setKey(StringArgumentType.getString(command,"Key"));
-
-            tag.putString("Key", StringArgumentType.getString(command,"Key"));
-            tag.putString("Character", StringArgumentType.getString(command,"Character"));
-
-            entity.moveTo(
-                        Vec3Argument.getVec3(command, "Coordinates").x,
-                        Vec3Argument.getVec3(command, "Coordinates").y,
-                        Vec3Argument.getVec3(command, "Coordinates").z,
-                        entity.getYRot(), entity.getXRot());
-
-            if (!net.minecraftforge.event.ForgeEventFactory.doSpecialSpawn(entity, stack.getLevel(), (float) entity.getX(), (float) entity.getY(), (float) entity.getZ(), null, MobSpawnType.COMMAND)){
-                entity.finalizeSpawn(stack.getLevel(), stack.getLevel().getCurrentDifficultyAt(entity.blockPosition()), MobSpawnType.COMMAND,null, tag);
-
-            }
-
-            if (!serverlevel.tryAddFreshEntityWithPassengers(entity)) {
-                throw ERROR_DUPLICATE_UUID.create();
-            } else {
-                stack.sendSuccess(Component.translatable("commands.summon.success", entity.getDisplayName()), true);
-                return 1;
-            }
+        if(player != null){
+            player.sendSystemMessage(Component.translatable("commands.summon.success", "Azure Actor<" + StringArgumentType.getString(command, "Key") + ">"));
         }
+        return 1;
     }
 }

@@ -3,18 +3,25 @@ package lv.sanelite.initium.event;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.block.ModBlocks;
+import lv.sanelite.initium.command.ScreenCommand;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.ModVillager;
 import lv.sanelite.initium.entity.actor.AzureNPC;
+import lv.sanelite.initium.entity.dataset.Character;
+import lv.sanelite.initium.entity.dataset.NPCMapper;
 import lv.sanelite.initium.item.ModItems;
 import lv.sanelite.initium.command.ActorUtilCommand;
 import lv.sanelite.initium.command.ActorNewCommand;
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.npc.VillagerTrades;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -28,6 +35,17 @@ public class ModEvents {
         public static void onCommandsRegister(RegisterCommandsEvent event){
             new ActorUtilCommand(event.getDispatcher());
             new ActorNewCommand(event.getDispatcher());
+            new ScreenCommand(event.getDispatcher());
+        }
+
+
+        @SubscribeEvent
+        public static void onActorHurtEvent(LivingHurtEvent event){
+            if(event.getEntity() instanceof AzureNPC npc){
+                if(event.getSource().getEntity() instanceof Player player){
+                    npc.talk(Character.getCharacter(npc.getThisCharacter()).getPhraseHurt());
+                }
+            }
         }
 
 
