@@ -9,7 +9,7 @@ import java.util.*;
 public class NPCMapper {
     public static Map<String, AzureNPC> actorMap = new HashMap<>();
 
-    public static void addListed(String key, AzureNPC actor){
+    public static void addActorToList(String key, AzureNPC actor){
         int id = actor.getId();
         if(actorMap.containsKey(String.valueOf(id))){
             actorMap.remove(String.valueOf(id));
@@ -17,24 +17,20 @@ public class NPCMapper {
         actorMap.put(key, actor);
 
     }
-    public static void delListed(String key){
-        if(actorMap.containsKey(key)){
-            actorMap.remove(key);
-        }
+    public static void deleteActorFromList(String key){
+        actorMap.remove(key);
 
     }
-    public static boolean rename(int id, String key){
+    public static void renameActorInList(int id, String key){
         if(actorMap.containsKey(String.valueOf(id))){
-            AzureNPC actor = getActor(String.valueOf(id));
-            delListed(String.valueOf(id));
-            addListed(key, actor);
-            return true;
+            AzureNPC actor = getActorByName(String.valueOf(id));
+            deleteActorFromList(String.valueOf(id));
+            addActorToList(key, actor);
         }
-        return false;
     }
 
 
-    public static AzureNPC getActor(String key){
+    public static AzureNPC getActorByName(String key){
         return actorMap.get(key);
     }
     public static boolean contains(AzureNPC actor){
@@ -42,12 +38,10 @@ public class NPCMapper {
     }
 
 
-    public static int availableActors(){
+    public static String getActors(){
         Set<String> ActorList;
         ActorList = actorMap.keySet();
-        Minecraft.getInstance().player.sendSystemMessage(Component.literal(ActorList.toString()).withStyle(ChatFormatting.BLUE));
-
-        return 1;
+        return ActorList.toString();
     }
 
 

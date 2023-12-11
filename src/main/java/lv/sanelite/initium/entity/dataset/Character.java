@@ -4,33 +4,61 @@ import lv.sanelite.initium.util.RGB;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Map;
 
 //TODO: Model Scale, SoundSet, ParticleSet
 
 
-public enum Character {
-    SENTRY(0,"sentry", RGB.color(255,0,162), ModelType.SENTRY, AnimationType.SANELITE),
-    MAXIE(1, "maxie", RGB.color(0,255,255), ModelType.ANGELOID, AnimationType.SANELITE),
-    MUSKUL(2, "muskul", RGB.color(221, 89, 89), ModelType.ALEX, AnimationType.NPC),
-    BLONDE(3, "blonde", RGB.color(255,255,0), ModelType.ALEX, AnimationType.NPC);
+public class Character {
+    private static Map<Integer, Character> characterMap = Map.of(
+            0, new Character( "maxie", RGB.color(0,255,255),
+                    new PhrasePoolSet(
+                            PhrasePool.getPoolByName("angeloid"),
+                            PhrasePool.getPoolByName("hurt")),
+                    ModelType.getModelType("angeloid"),
+                    AnimationType.getAnimationType("sanelite")),
 
-    public static final Character[] BY_ID = Arrays.stream(values()).sorted(Comparator
-                            .comparingInt(Character::getId)).toArray(Character[]::new);
-    private final int id;
+            1, new Character("sentry", RGB.color(255,0,162),
+                    new PhrasePoolSet(
+                            PhrasePool.getPoolByName("angeloid"),
+                            PhrasePool.getPoolByName("hurt")),
+                    ModelType.getModelType("sentry"),
+                    AnimationType.getAnimationType("sanelite")),
+
+            2, new Character( "muskul", RGB.color(221, 89, 89),
+                    new PhrasePoolSet(
+                            PhrasePool.getPoolByName("default"),
+                            PhrasePool.getPoolByName("hurt")),
+                    ModelType.getModelType("alex"),
+                    AnimationType.getAnimationType("npc")),
+
+            3, new Character( "blonde", RGB.color(255,255,0),
+                    new PhrasePoolSet(
+                            PhrasePool.getPoolByName("default"),
+                            PhrasePool.getPoolByName("hurt")),
+                    ModelType.getModelType("alex"),
+                    AnimationType.getAnimationType("npc"))
+    );
+
     private final String name;
-    private int color;
-    private ModelType model;
-    private AnimationType animation;
+    private final int color;
+    private final PhrasePoolSet phrasePoolset;
+    private final ModelType model;
+    private final AnimationType animation;
 
-    Character(int identificator, String name_key, int textColor, ModelType modelType, AnimationType animationSet){
-        this.id = identificator;
+    private Character(String name_key, int textColor, PhrasePoolSet poolSet, ModelType modelType, AnimationType animationSet){
         this.name = name_key;
         this.color = textColor;
+        this.phrasePoolset = poolSet;
         this.model = modelType;
         this.animation = animationSet;
     }
+    public static void newCharacter(String name_key, int textColor, PhrasePoolSet poolSet, ModelType modelType, AnimationType animationSet){
+        Character character = new Character(name_key, textColor, poolSet, modelType, animationSet);
+        Character.characterMap.put(characterMap.size() + 1, character);
+    }
 
-    public int getId(){return this.id;}
+
     public int getColor() {
         return color;
     }
@@ -46,18 +74,21 @@ public enum Character {
     public boolean isGlowing(){
         return model.isGlowing();
     }
-
-    public static Character getCharacter(String name){
-        for(int i = 0; i < BY_ID.length; i++){
-            if(name.equals(byId(i).getName())){
-                return byId(i);
-            }
-        }
-        return MAXIE;
+    public String getPhraseTalk(){
+        return this.phrasePoolset.getTalk();
+    }
+    public String getPhraseHurt(){
+        return this.phrasePoolset.getHurt();
     }
 
-    public static Character byId(int id) {
-        return BY_ID[id % BY_ID.length];
+
+    public static Character getCharacter(String name){
+        for(int i = 0; i < characterMap.size(); i++){
+            if(name.equals(characterMap.get(i).getName())){
+                return characterMap.get(i);
+            }
+        }
+        return characterMap.get(0);
     }
 
 }
