@@ -8,13 +8,14 @@ CURR    - Custom Targeting
         DONE    * Move to
         DONE    * Stay at
                 * Patrol
-
+DONE    - Actor Phrase Pool
 DONE    - Memory saving system
 DONE    - Access mapping
 DONE    - TRANSFERED TO AZURELIB
 DONE    - Selective model/texture
             ADVANCED LOW PRIORITY
             - Customizble behavior
+DONE    - Actor simple tool
 
     Actor types:
 DONE    - Simple Actor type
@@ -45,6 +46,7 @@ CURR    - Animated Blocks
     Actor visuals:
 DONE    - Custom text colors
 DONE    - Actor Glowing
+CURR            * Glowing by type
         LOW PRIORITY
         - Particle system
                 * Visibile Range
@@ -54,8 +56,8 @@ DONE    - Actor Glowing
                 * Magic/Visuals
 
     Rendering features:
-CURR    - Black screen or Hex color
-        - Screen fading to Hex color
+DONE    - Black screen or Hex color
+DONE    - Screen fading to Hex color
             ADVANCED LOW PRIORITY
             - Video sequence importing
 
