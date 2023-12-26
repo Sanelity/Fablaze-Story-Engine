@@ -5,7 +5,6 @@ import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandExceptionType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import lv.sanelite.initium.core.ActorFunction;
 import lv.sanelite.initium.entity.actor.AzureNPC;
@@ -17,10 +16,6 @@ import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-
-import java.lang.invoke.WrongMethodTypeException;
-
-import static lv.sanelite.initium.core.ActorFunction.getActor;
 
 public class ActorUtilCommand {
     public ActorUtilCommand(CommandDispatcher<CommandSourceStack> dispatcher){
@@ -60,20 +55,20 @@ public class ActorUtilCommand {
             .executes(this::eliminate))));                                                       //Execute
     }
     public int sendMessage(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        AzureNPC entity = getActor(StringArgumentType.getString(command, "Name"));
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
         entity.talk(StringArgumentType.getString(command, "Message"));
         return 1;
     }
     public int setLook(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        AzureNPC entity = getActor(StringArgumentType.getString(command, "Name"));
-        Entity target = getActor(StringArgumentType.getString(command, "Target"));
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
+        Entity target = ActorFunction.getActor(StringArgumentType.getString(command, "Target"));
 
         ActorFunction.setLookTarget(target,entity);
         return 1;
     }
 
     public int changeRes(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        AzureNPC entity = getActor(StringArgumentType.getString(command, "Name"));
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
         entity.setCharacter(StringArgumentType.getString(command, "Resource"));
         return 1;
     }
@@ -86,13 +81,13 @@ public class ActorUtilCommand {
         return 1;
     }
     public int eliminate(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        Entity killable = getActor(StringArgumentType.getString(command, "Name"));
+        Entity killable = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
         killable.discard();
         NPCMapper.deleteActorFromList(StringArgumentType.getString(command, "Name"));
         return 1;
     }
     public int resendTarged(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        AzureNPC entity = getActor(StringArgumentType.getString(command,"Name"));
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command,"Name"));
 
         ActorFunction.setMoveTarget(
                 Vec3Argument.getVec3(command,"Coordinates"),
@@ -103,7 +98,7 @@ public class ActorUtilCommand {
     }
 
     public int setVisibility(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
-        AzureNPC entity = getActor(StringArgumentType.getString(command,"Name"));
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command,"Name"));
         entity.setCustomNameVisible(BoolArgumentType.getBool(command, "Boolean"));
         return 1;
     }

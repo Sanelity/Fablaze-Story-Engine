@@ -10,7 +10,6 @@ import lv.sanelite.initium.core.ActorFunction;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.actor.AzureNPC;
 import lv.sanelite.initium.event.ClientEvents;
-import lv.sanelite.initium.event.ModForgeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.*;
 import net.minecraft.client.gui.components.events.GuiEventListener;

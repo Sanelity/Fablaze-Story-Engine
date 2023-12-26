@@ -20,6 +20,7 @@ import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 public class BlackScreenHUD{
     private static final ResourceLocation BLACK_SCREEN = new ResourceLocation(Initium.MOD_ID, "textures/gui/blackscreen.png");
     public static boolean ACTIVE = true;
+    public static boolean DEBUG = false;
 
     private static RGB screenColor = new RGB(0,0,0);
 
@@ -31,11 +32,7 @@ public class BlackScreenHUD{
 
 
     public static IGuiOverlay BLACKSCREEN_HUD = (gui, poseStack, partialTick, width, height) -> {
-//        GuiComponent.drawString(poseStack, Minecraft.getInstance().font, String.valueOf(ClientEvents.ClientForgeEvents.tick),
-//                10,10,RGB.color(255,0,0));
-//
-//        GuiComponent.drawString(poseStack, Minecraft.getInstance().font, String.valueOf(alpha),
-//                10,0,RGB.color(0,0,255));
+
 
         if((ClientEvents.ClientForgeEvents.tick - markTime + offset) <= (fadeTime + offset) && fadeToBlack){
             alpha = (float) (ClientEvents.ClientForgeEvents.tick - markTime + offset) / (fadeTime + offset);
@@ -58,6 +55,15 @@ public class BlackScreenHUD{
             GuiComponent.blit(poseStack,0,0,width,height,width,height,0,0);
             RenderSystem.setShaderColor(1F,1F,1F,1F);
         }
+
+        if(DEBUG){
+            GuiComponent.drawString(poseStack, Minecraft.getInstance().font, String.valueOf(ClientEvents.ClientForgeEvents.tick),
+                10,10,RGB.color(255,0,0));
+
+            GuiComponent.drawString(poseStack, Minecraft.getInstance().font, String.valueOf(alpha),
+                    10,0,RGB.color(0,0,255));
+        }
+
     };
 
     public static void use(int transitionTime, int offset, boolean polarity, RGB color){
@@ -66,10 +72,10 @@ public class BlackScreenHUD{
         fadeToBlack = polarity;
         screenColor = color;
 
-//        int calc = markTime + fadeTime;
-//        Player player = Minecraft.getInstance().player;
-//        player.sendSystemMessage(Component.literal("[Polarity: " + polarity + "] - Fade time ticks - " + transitionTime).withStyle(ChatFormatting.RED));
-//        player.sendSystemMessage(Component.literal("Marked at " + markTime + " - fade to " + calc).withStyle(ChatFormatting.RED));
+        int calc = markTime + fadeTime;
+        Player player = Minecraft.getInstance().player;
+        player.sendSystemMessage(Component.literal("[Polarity: " + polarity + "] - Fade time ticks - " + transitionTime).withStyle(ChatFormatting.RED));
+        player.sendSystemMessage(Component.literal("Marked at " + markTime + " - fade to " + calc).withStyle(ChatFormatting.RED));
 
     }
 

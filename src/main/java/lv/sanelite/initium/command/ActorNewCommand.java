@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import lv.sanelite.initium.core.ActorFunction;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.actor.AzureNPC;
 import net.minecraft.commands.CommandSourceStack;
@@ -17,8 +18,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-
-import static lv.sanelite.initium.core.ActorFunction.createActor;
 
 public class ActorNewCommand {
     private static final SimpleCommandExceptionType ERROR_DUPLICATE_UUID = new SimpleCommandExceptionType(Component.translatable("commands.summon.failed.uuid"));
@@ -38,7 +37,7 @@ public class ActorNewCommand {
 
     private int summonKeyedActor(CommandSourceStack stack, CommandContext command) throws CommandSyntaxException {
         Player player = stack.getPlayer();
-        createActor(
+        new ActorFunction().createActor(
                 StringArgumentType.getString(command, "Character"),
                 StringArgumentType.getString(command, "Key"),
                 stack.getLevel(),
