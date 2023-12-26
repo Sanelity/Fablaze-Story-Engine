@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import lv.sanelite.initium.Initium;
 import lv.sanelite.initium.block.ModBlocks;
 import lv.sanelite.initium.command.ScreenCommand;
+import lv.sanelite.initium.command.SequencerCommand;
 import lv.sanelite.initium.entity.ModEntityTypes;
 import lv.sanelite.initium.entity.ModVillager;
 import lv.sanelite.initium.entity.actor.AzureNPC;
@@ -36,6 +37,7 @@ public class ModEvents {
             new ActorUtilCommand(event.getDispatcher());
             new ActorNewCommand(event.getDispatcher());
             new ScreenCommand(event.getDispatcher());
+            new SequencerCommand(event.getDispatcher());
         }
 
 

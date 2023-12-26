@@ -20,15 +20,25 @@ import java.util.Map;
 import static lv.sanelite.initium.entity.dataset.PhrasePool.addPhrase;
 import static lv.sanelite.initium.entity.dataset.PhrasePool.newPhrasePool;
 
+/**<h4>Functional base for controlling Actor Entities in any case<h4/>
+ * Usage keyword [actor] -
+ * Main usage for this class is:
+ * <ul>
+ * <li>Creating new materials for new Actors<li/>
+ * Creating new Actors, Changing it parts on-fly
+ * <li>Directing and defining the Actor's actions<li/>
+ * </ul>
+ * The list of commands may be added at any time
+ */
 public class ActorFunction {
                                 /// --- --- --- Resource section --- --- --- ///
     ///Character section
     public static void createCharacter(String namespace, int red, int green, int blue,
-                                       String dialog_pool, String hurt_pool, String modelType, String animationType){
-
-        Character.newCharacter(namespace, RGB.color(red, green, blue), PhrasePoolSet.loadPool(dialog_pool, hurt_pool),
-                ModelType.getModelType(modelType), AnimationType.getAnimationType(animationType));
-
+                                       String dialog_pool, String hurt_pool, String modelType, String animationType)
+    {
+        Character.newCharacter(namespace, RGB.color(red, green, blue),
+        PhrasePoolSet.loadPool(dialog_pool, hurt_pool),
+        ModelType.getModelType(modelType), AnimationType.getAnimationType(animationType));
     }
     ///TODO Load new Resources
     public static void loadModel(String resource_location, boolean glowing){};
@@ -79,6 +89,10 @@ public class ActorFunction {
     }
     public static void setLookPos(Vec3 pos, AzureNPC actor){
         actor.setLookAt(pos);
+    }
+
+    public static void say(String actor, String message){
+        getActor(actor).talk(message);
     }
 
     ///In-game Actor relocation
