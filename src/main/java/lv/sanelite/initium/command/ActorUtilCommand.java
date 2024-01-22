@@ -1,23 +1,35 @@
 package lv.sanelite.initium.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import lv.sanelite.initium.core.ActorFunction;
 import lv.sanelite.initium.entity.actor.AzureNPC;
 import lv.sanelite.initium.entity.dataset.NPCMapper;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.commands.arguments.EntitySummonArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
+import net.minecraft.commands.synchronization.SuggestionProviders;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 
 public class ActorUtilCommand {
+
     public ActorUtilCommand(CommandDispatcher<CommandSourceStack> dispatcher){
         dispatcher.register(Commands.literal("actor")                                   // - /actor ...
 
@@ -45,25 +57,105 @@ public class ActorUtilCommand {
             .then(Commands.argument("Boolean", BoolArgumentType.bool())                 // - /actor name "Name" "Boolean"
             .executes(this::setVisibility))))
 
-            .then(Commands.literal("look")
+            .then(Commands.literal("look-actor")
             .then(Commands.argument("Name", StringArgumentType.word())
             .then(Commands.argument("Target", StringArgumentType.word())
             .executes(this::setLook))))
+
+            .then(Commands.literal("look-position")
+            .then(Commands.argument("Name", StringArgumentType.word())
+            .then(Commands.argument("Coordinates", Vec3Argument.vec3())
+            .executes(this::setLookPos))))
+
+            .then(Commands.literal("look-entity")
+            .then(Commands.argument("Name", StringArgumentType.word())
+            .then(Commands.argument("Target", EntityArgument.entity())
+            .executes(this::setLookEntity))))
+
+            .then(Commands.literal("look-type")
+            .then(Commands.argument("Name", StringArgumentType.word())
+            .then(Commands.argument("Target", EntitySummonArgument.id()).suggests(SuggestionProviders.SUMMONABLE_ENTITIES)
+            .executes(this::setLookType))))
+
+            .then(Commands.literal("animation")
+            .then(Commands.argument("Name", StringArgumentType.word())
+            .then(Commands.argument("Action", StringArgumentType.string())
+            .then(Commands.argument("Emote", StringArgumentType.string())
+            .then(Commands.argument("Look", StringArgumentType.string())
+            .then(Commands.argument("Additional", StringArgumentType.string())
+            .executes(this::setAnimation)))))))
 
             .then(Commands.literal("eliminate")                                         // - /actor eliminate ...
             .then(Commands.argument("Name", StringArgumentType.word())                  // - /actor eliminate "Name" ...
             .executes(this::eliminate))));                                                       //Execute
     }
+    public int setAnimation(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
+        String act,emo,look,add;
+        if(!StringArgumentType.getString(command, "Action").equals("0")){
+            act = StringArgumentType.getString(command, "Action");
+        }else act = null;
+        if(!StringArgumentType.getString(command, "Emote").equals("0")){
+            emo = StringArgumentType.getString(command, "Emote");
+        }else emo = null;
+        if(!StringArgumentType.getString(command, "Look").equals("0")){
+            look = StringArgumentType.getString(command, "Look");
+        }else look = null;
+        if(!StringArgumentType.getString(command, "Additional").equals("0")){
+            add = StringArgumentType.getString(command, "Additional");
+        }else add = null;
+
+
+        ActorFunction.setAnimation(entity, act, emo, look, add);
+        return 1;
+    }
+
     public int sendMessage(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
         AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
         entity.talk(StringArgumentType.getString(command, "Message"));
         return 1;
     }
+
+    public int setLookEntity(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
+        Entity target = EntityArgument.getEntity(command, "Target");
+        ActorFunction.setLook(entity, target);
+
+
+        return 1;
+    }
+    public int setLookPos(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
+        Vec3 vector = Vec3Argument.getVec3(command, "Coordinates");
+        ActorFunction.setLookPos(entity, vector);
+
+
+        return 1;
+    }
+
     public int setLook(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
         AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
-        Entity target = ActorFunction.getActor(StringArgumentType.getString(command, "Target"));
+        AzureNPC target = ActorFunction.getActor(StringArgumentType.getString(command, "Target"));
 
-        ActorFunction.setLookTarget(target,entity);
+        ActorFunction.setLook(entity, target);
+        return 1;
+    }
+
+    public int setLookType(CommandContext<CommandSourceStack> command) throws CommandSyntaxException{
+        AzureNPC entity = ActorFunction.getActor(StringArgumentType.getString(command, "Name"));
+        ActorFunction.setLookType(entity, EntitySummonArgument.getSummonableEntity(command, "Target"));
+
+//        CompoundTag tag = new CompoundTag();
+//        tag.putString("id",EntitySummonArgument.getSummonableEntity(command, "Target").toString());
+//        Entity target = EntityType.loadEntityRecursive(tag,command.getSource().getLevel(), summoned -> {
+//            summoned.discard();
+//            return summoned;
+//        });
+//
+//        if(target.getType().getCategory() != MobCategory.MISC){
+//            ActorFunction.setLookType(entity, target);
+//        }else throw ERROR_NOT_LIVING.create();
+
         return 1;
     }
 

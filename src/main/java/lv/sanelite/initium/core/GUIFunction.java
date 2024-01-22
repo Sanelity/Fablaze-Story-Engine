@@ -4,9 +4,7 @@ import lv.sanelite.initium.gui.BlackScreenHUD;
 import lv.sanelite.initium.util.RGB;
 import net.minecraft.client.Minecraft;
 
-/**<h3>Graphic User Interface related functions<h3/>
- *
- */
+/**<h3>Graphic User Interface related functions<h3/>*/
 
 public class GUIFunction {
     /**<h3>Full GUI Hide function<h3/>
@@ -20,11 +18,11 @@ public class GUIFunction {
         return Minecraft.getInstance().options.hideGui;
     }
 
-    public static void transitionScreen(int transition, int offset, boolean polarity, int red, int green, int blue){
-        BlackScreenHUD.use(transition, offset, polarity, new RGB(red, green, blue));
+    public static void transitionScreen(int transition_time, int offset, boolean toBlack, int red, int green, int blue){
+        BlackScreenHUD.use(transition_time, offset, toBlack, new RGB(red, green, blue));
     }
     public static void instantBlackScreen(boolean active){
-        transitionScreen(2,0,active, 0,0,0);
+        transitionScreen(0,0,active, 0,0,0);
     }
 
 

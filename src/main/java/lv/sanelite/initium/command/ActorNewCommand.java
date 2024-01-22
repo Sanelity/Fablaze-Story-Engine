@@ -20,9 +20,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public class ActorNewCommand {
-    private static final SimpleCommandExceptionType ERROR_DUPLICATE_UUID = new SimpleCommandExceptionType(Component.translatable("commands.summon.failed.uuid"));
-    private static final SimpleCommandExceptionType INVALID_POSITION = new SimpleCommandExceptionType(Component.translatable("commands.summon.invalidPosition"));
-
     // TODO - Clean up summon code
     // TODO HIGH PRIORITY TASK *** Change SentryNPC class initialization to fit in Keying!!!
 
@@ -37,7 +34,7 @@ public class ActorNewCommand {
 
     private int summonKeyedActor(CommandSourceStack stack, CommandContext command) throws CommandSyntaxException {
         Player player = stack.getPlayer();
-        new ActorFunction().createActor(
+        ActorFunction.createActor(
                 StringArgumentType.getString(command, "Character"),
                 StringArgumentType.getString(command, "Key"),
                 stack.getLevel(),

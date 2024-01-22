@@ -5,15 +5,19 @@ import lv.sanelite.initium.entity.actor.AzureNPC;
 import lv.sanelite.initium.entity.dataset.*;
 import lv.sanelite.initium.entity.dataset.Character;
 import lv.sanelite.initium.util.RGB;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
@@ -76,6 +80,9 @@ public class ActorFunction {
         entityType.spawn(serverLevel,tag,null,null, new BlockPos(coords.x(),coords.y(),coords.z()), MobSpawnType.COMMAND,false,false);
 
     }
+    public static void createActor(String char_name, String char_key, ServerLevel serverLevel, double x, double y, double z){
+        createActor(char_name,char_key,serverLevel,new Vec3(x,y,z));
+    }
     public static void createActor(String char_name, String char_key, ServerLevel serverLevel, Player player){
         createActor(char_name, char_key, serverLevel, new Vec3(player.getX(),player.getY(),player.getZ()));
     }
@@ -83,16 +90,31 @@ public class ActorFunction {
         ///TODO
     }
 
-    ///In-game Actor interaction
-    public static void setLookTarget(Entity target, AzureNPC actor){
-        actor.setLookTarget(target);
-    }
-    public static void setLookPos(Vec3 pos, AzureNPC actor){
-        actor.setLookAt(pos);
+    public static void eliminate(String char_key){
+        AzureNPC actor = getActor(char_key);
+        actor.discard();
     }
 
-    public static void say(String actor, String message){
-        getActor(actor).talk(message);
+    ///TODO In-game Actor interaction
+    public static void setLook(AzureNPC actor, Entity target){
+        actor.setLookTarget(target);
+    }
+    public static void setLookPos(AzureNPC actor, Vec3 pos){
+        actor.setLookAt(pos);
+    }
+    public static void setLookType(AzureNPC actor, ResourceLocation target){
+        actor.setLookType(target);
+    }
+    public static void resetLook(AzureNPC actor){
+        actor.resetLook();
+    }
+
+    public static void setAnimation(AzureNPC actor, @Nullable String action, @Nullable String emote, @Nullable String look, @Nullable String additional){
+        actor.setAnimations(action, emote, look, additional);
+    }
+
+    public static void say(AzureNPC actor, String message){
+        actor.talk(message);
     }
 
     ///In-game Actor relocation
@@ -105,6 +127,7 @@ public class ActorFunction {
         teleportActor(x,y,z,actor);
     }
 
+    ///TODO - add relative targeting (Current(x10) + x5 = x15 target)
     public static void setMoveTarget(Vec3 pos, double speed, boolean bypass, AzureNPC actor){
         actor.newTarget(pos,speed,bypass);
     }
