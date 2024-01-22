@@ -18,6 +18,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -28,7 +29,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.entity.player.Player;
@@ -57,26 +57,39 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         return cache;
     }
 
+    public void setAnimations(@Nullable String action, @Nullable String emote, @Nullable String look, @Nullable String additional){
+        if(action != null){
+            this.entityData.set(ANIMATED_ACTION, action);
+        }if(emote != null){
+            this.entityData.set(ANIMATED_EMOTE, emote);
+        }if(look != null){
+            this.entityData.set(ANIMATED_LOOK, look);
+        }if(additional != null){
+            this.entityData.set(ANIMATED_ADDITIONAL, additional);
+        }
+    }
+
+    AnimationController<AzureNPC> action_animator = new AnimationController<>(this, "actions", 4, event ->
+            event.setAndContinue(
+                    // If moving, play the walking animation
+                    event.isMoving() ? RawAnimation.begin().thenLoop("walk.action"):
+                            // If not moving, play the idle animation
+                            RawAnimation.begin().thenLoop(this.entityData.get(ANIMATED_ACTION))
+            ));
+    AnimationController<AzureNPC> emote_animator = new AnimationController<>(this, "emotes", 4, event ->
+            event.setAndContinue(RawAnimation.begin().thenLoop(this.entityData.get(ANIMATED_EMOTE))));
+    AnimationController<AzureNPC> look_animator = new AnimationController<>(this, "look", 4, event ->
+            event.setAndContinue(RawAnimation.begin().thenLoop(this.entityData.get(ANIMATED_LOOK))));
+    AnimationController<AzureNPC> additional_animator = new AnimationController<>(this, "additionals", 4, event ->
+            event.setAndContinue(RawAnimation.begin().thenLoop(this.entityData.get(ANIMATED_ADDITIONAL))));
+
+
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "controller", 4, event ->
-        {
-            return event.setAndContinue(
-                    // If moving, play the walking animation
-                    event.isMoving() ? RawAnimation.begin().thenLoop("walk.animation"):
-                            // If not moving, play the idle animation
-                            RawAnimation.begin().thenLoop("idle.animation"));
-        })
-                // Sets a Sound KeyFrame
-                .setSoundKeyframeHandler(event -> {
-                    //Plays the step sound on the walk keyframes in an animation
-                    if (event.getKeyframeData().getSound().matches("walk"))
-                        if (level.isClientSide())
-                            level.playLocalSound(
-                                    this.getX(), this.getY(), this.getZ(),
-                                    SoundEvents.CAT_DEATH,
-                                    SoundSource.HOSTILE, 0.25F, 1.0F, false);
-                }));
+        controllers.add(additional_animator);
+        controllers.add(action_animator);
+        controllers.add(emote_animator);
+        controllers.add(look_animator);
     }
 
         public static AttributeSupplier setAttributes (){
@@ -87,13 +100,15 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
                 .add(Attributes.JUMP_STRENGTH, 1.0f)
                 .add(Attributes.MOVEMENT_SPEED, 0.28f).build();
     }
+    protected LookAtGoal look;
+
 
         @Override
     protected void registerGoals(){
         removeFreeWill();
-
-
-        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5f, 1f, false));
+        look = new LookAtGoal(this);
+        this.goalSelector.addGoal(4, look);
+//        this.goalSelector.addGoal(4, new LookAtPlayerGoal(this, Player.class, 5f, 1f, false));
 //        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
     }
 
@@ -111,12 +126,25 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         return super.finalizeSpawn(serverLevelAccessor, difficultyInstance, spawnType, spawnGroupData, initData);
     }
 
+    public static final EntityDataAccessor<String> ANIMATED_ADDITIONAL =
+            SynchedEntityData.defineId(AzureNPC.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<String> ANIMATED_LOOK =
+            SynchedEntityData.defineId(AzureNPC.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<String> ANIMATED_EMOTE =
+            SynchedEntityData.defineId(AzureNPC.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<String> ANIMATED_ACTION =
+            SynchedEntityData.defineId(AzureNPC.class, EntityDataSerializers.STRING);
+
     public static final EntityDataAccessor<String> DATA_CHARACTER =
             SynchedEntityData.defineId(AzureNPC.class, EntityDataSerializers.STRING);
 
     @Override
     protected void defineSynchedData(){
         super.defineSynchedData();
+        this.entityData.define(ANIMATED_ADDITIONAL, "empty.additional");
+        this.entityData.define(ANIMATED_LOOK, "idle.look");
+        this.entityData.define(ANIMATED_EMOTE, "idle.emote");
+        this.entityData.define(ANIMATED_ACTION, "idle.action");
         this.entityData.define(DATA_CHARACTER, getPersistentData().getString("character"));
     }
 
@@ -189,6 +217,7 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
     String KEY = String.valueOf(this.getId());
     String CHARACTER = "default";
     Vec3 TARGET = new Vec3(0,0,0);
+
     double SPEED = 1.0d;
     double ENTER = 0.5d;
     double LEAVE = 1.5d;
@@ -225,10 +254,19 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
     }
 
     public void setLookTarget(Entity target){
-        this.getLookControl().setLookAt(target);
+        resetLook();
+        look.setLookAt(target);
     }
     public void setLookAt(Vec3 pos){
-        this.getLookControl().setLookAt(pos);
+        resetLook();
+        look.setLookPos(pos);
+    }
+    public void setLookType(ResourceLocation target){
+        resetLook();
+        look.setLookType(target);
+    }
+    public void resetLook(){
+        look.reset();
     }
 
     public String getThisCharacter(){
@@ -247,10 +285,33 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         this.CHARACTER = compoundTag.getString("character");
         this.entityData.set(DATA_CHARACTER, compoundTag.getString("character"));
 
+        this.entityData.set(ANIMATED_ACTION, compoundTag.getString("animated_action"));
+        this.entityData.set(ANIMATED_EMOTE, compoundTag.getString("animated_emote"));
+        this.entityData.set(ANIMATED_LOOK, compoundTag.getString("animated_look"));
+        this.entityData.set(ANIMATED_ADDITIONAL, compoundTag.getString("animated_additional"));
+
         this.KEY = compoundTag.getString("key");
         this.SPEED = compoundTag.getDouble("speed");
         this.ENTER = compoundTag.getDouble("enter");
         this.LEAVE = compoundTag.getDouble("leave");
+
+        if(!compoundTag.getString("looktarget").isEmpty()){
+            look.loadEntityUUID(compoundTag.getString("looktarget"));
+        }
+
+        if(compoundTag.getDouble("xlook") != 0){
+            setLookAt(new Vec3(
+                    compoundTag.getDouble("xlook"),
+                    compoundTag.getDouble("ylook"),
+                    compoundTag.getDouble("zlook")
+            ));
+        }
+
+        if(!compoundTag.getString(compoundTag.getString("looktype")).isEmpty()){
+            setLookType(new ResourceLocation(compoundTag.getString("looktype")));
+        }
+
+
 
         this.INITIALIZED = compoundTag.getBoolean("initialized");
         this.BYPASS = compoundTag.getBoolean("bypass");
@@ -262,12 +323,19 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
                 compoundTag.getDouble("y"),
                 compoundTag.getDouble("z")
         );
+
+
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.putString("character", this.CHARACTER);
+
+        compoundTag.putString("animated_action", this.entityData.get(ANIMATED_ACTION));
+        compoundTag.putString("animated_emote", this.entityData.get(ANIMATED_EMOTE));
+        compoundTag.putString("animated_look", this.entityData.get(ANIMATED_LOOK));
+        compoundTag.putString("animated_additional", this.entityData.get(ANIMATED_ADDITIONAL));
 
         compoundTag.putBoolean("initialized", this.INITIALIZED);
         compoundTag.putBoolean("bypass", this.BYPASS);
@@ -277,11 +345,27 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         compoundTag.putDouble("enter", this.ENTER);
         compoundTag.putDouble("leave", this.LEAVE);
 
+        if(look.getLookType() != null) {
+            compoundTag.putString("looktype", look.getLookType());
+        }
+
+        if(look.getLookAt() != null){
+            compoundTag.putString("looktarget", look.getLookAt().getStringUUID());
+        }
+
+        if(look.getLookPos() != null){
+            compoundTag.putDouble("xlook", look.getLookPos().x);
+            compoundTag.putDouble("ylook", look.getLookPos().y);
+            compoundTag.putDouble("zlook", look.getLookPos().z);
+        }
+
+
         compoundTag.putInt("color", getColor());
 
         compoundTag.putDouble("x", this.TARGET.x);
         compoundTag.putDouble("y", this.TARGET.y);
         compoundTag.putDouble("z", this.TARGET.z);
+
 
     }
 
@@ -324,11 +408,8 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         //Debugging
     public void tracker(){
         Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                        ("Current: " + this.getBlockX() + " " + this.getBlockY() + " " + this.getBlockZ() + " | " + this.KEY + this.getId())
+                        ("View Target: " + look.getLookAt() + " | " + this.KEY + this.getId())
                 .withStyle(ChatFormatting.RED));
-        Minecraft.getInstance().player.sendSystemMessage(Component.literal
-                        ("Target: " + Math.round(TARGET.x) + " " + Math.round(TARGET.y) + " " + Math.round(TARGET.z))
-                .withStyle(ChatFormatting.GOLD));
     }
 
 
