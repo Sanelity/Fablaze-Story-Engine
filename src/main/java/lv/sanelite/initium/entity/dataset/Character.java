@@ -37,7 +37,25 @@ public class Character {
                             PhrasePool.getPoolByName("default"),
                             PhrasePool.getPoolByName("hurt")),
                     ModelType.getModelType("alex"),
-                    AnimationType.getAnimationType("npc"))
+                    AnimationType.getAnimationType("npc")),
+            4, new Character( "lansundash", RGB.color(233,141,88),
+                    new PhrasePoolSet(
+                            PhrasePool.getPoolByName("default"),
+                            PhrasePool.getPoolByName("hurt")),
+                    ModelType.getModelType("sentry"),
+                    AnimationType.getAnimationType("sanelite")),
+            5, new Character( "waith", RGB.color(250,248,252),
+                    new PhrasePoolSet(
+                            PhrasePool.getPoolByName("default"),
+                            PhrasePool.getPoolByName("hurt")),
+                    ModelType.getModelType("sentry"),
+                    AnimationType.getAnimationType("sanelite")),
+            6, new Character( "mikka", RGB.color(112,26,200),
+                    new PhrasePoolSet(
+                            PhrasePool.getPoolByName("default"),
+                            PhrasePool.getPoolByName("hurt")),
+                    ModelType.getModelType("sentry"),
+                    AnimationType.getAnimationType("sanelite"))
     );
 
     private final String name;
