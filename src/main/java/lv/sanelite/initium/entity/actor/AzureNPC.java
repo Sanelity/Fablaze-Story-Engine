@@ -295,6 +295,9 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         this.ENTER = compoundTag.getDouble("enter");
         this.LEAVE = compoundTag.getDouble("leave");
 
+        if(!compoundTag.getString("looktype").isEmpty()){
+            setLookType(new ResourceLocation(compoundTag.getString("looktype")));
+        }
         if(!compoundTag.getString("looktarget").isEmpty()){
             look.loadEntityUUID(compoundTag.getString("looktarget"));
         }
@@ -307,12 +310,6 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
             ));
         }
 
-        if(!compoundTag.getString(compoundTag.getString("looktype")).isEmpty()){
-            setLookType(new ResourceLocation(compoundTag.getString("looktype")));
-        }
-
-
-
         this.INITIALIZED = compoundTag.getBoolean("initialized");
         this.BYPASS = compoundTag.getBoolean("bypass");
 
@@ -323,8 +320,6 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
                 compoundTag.getDouble("y"),
                 compoundTag.getDouble("z")
         );
-
-
     }
 
     @Override
@@ -349,7 +344,7 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
             compoundTag.putString("looktype", look.getLookType());
         }
 
-        if(look.getLookAt() != null){
+        if(look.getLookType() == null && look.getLookAt() != null){
             compoundTag.putString("looktarget", look.getLookAt().getStringUUID());
         }
 
