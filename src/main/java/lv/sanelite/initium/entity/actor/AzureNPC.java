@@ -1,7 +1,10 @@
 package lv.sanelite.initium.entity.actor;
 
+import com.mojang.brigadier.arguments.StringArgumentType;
+import lv.sanelite.initium.core.ActorFunction;
 import lv.sanelite.initium.entity.dataset.Character;
 import lv.sanelite.initium.entity.dataset.NPCMapper;
+import lv.sanelite.initium.item.ModItems;
 import lv.sanelite.initium.util.RGB;
 import mod.azure.azurelib.animatable.GeoEntity;
 import mod.azure.azurelib.core.animatable.instance.AnimatableInstanceCache;
@@ -198,7 +201,12 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
             }
         }else if(!level.isClientSide() && hand == InteractionHand.MAIN_HAND && isMsgReloaded()) {
             talk(Character.getCharacter(getThisCharacter()).getPhraseTalk());
+        } else if (player.isHolding(ModItems.DEL_TOOL.get())) {
+            //Pososi y Fotoramki
+            ActorFunction.eliminate(this);
+            NPCMapper.deleteActorFromList(this.KEY);
         }
+
         return InteractionResult.SUCCESS;
     }
 

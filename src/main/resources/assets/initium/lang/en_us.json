@@ -5,6 +5,7 @@
   "item.initium.infinitum": "Infinitum",
   "item.initium.sentry_spawn_egg": "Sentry Spawn egg",
   "item.initium.add_tool": "§k_§rActor Add Tool§k_",
+  "item.initium.del_tool": "§k_§rActor Del Tool§k_",
 
 
   "block.initium.uranium_block": "Block of §kUranium",

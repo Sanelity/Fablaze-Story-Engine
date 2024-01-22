@@ -95,6 +95,10 @@ public class ActorFunction {
         actor.discard();
     }
 
+    public static void eliminate(AzureNPC actor){;
+        actor.discard();
+    }
+
     ///TODO In-game Actor interaction
     public static void setLook(AzureNPC actor, Entity target){
         actor.setLookTarget(target);

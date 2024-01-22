@@ -11,6 +11,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import lv.sanelite.initium.item.advanced.DelActorToolItem;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
@@ -58,6 +59,15 @@ public class ModItems {
     public static final  RegistryObject<Item> ADD_TOOL =
             ITEMS.register("add_tool",
                     () -> new AddActorToolItem(new Item.Properties()
+                            .stacksTo(1)
+                            .tab(ModCreativeModeTab.INITIUM_TAB)
+                            .rarity(SaneliteRarity.MYTHICAL)
+                    )
+            );
+
+    public static final  RegistryObject<Item> DEL_TOOL =
+            ITEMS.register("del_tool",
+                    () -> new DelActorToolItem(new Item.Properties()
                             .stacksTo(1)
                             .tab(ModCreativeModeTab.INITIUM_TAB)
                             .rarity(SaneliteRarity.MYTHICAL)
