@@ -67,16 +67,25 @@ public class BlackScreenHUD{
     };
 
     public static void use(int transitionTime, int offset, boolean polarity, RGB color){
-        markTime = ClientEvents.ClientForgeEvents.tick;
-        fadeTime = transitionTime;
-        fadeToBlack = polarity;
         screenColor = color;
 
-        int calc = markTime + fadeTime;
-        Player player = Minecraft.getInstance().player;
-        player.sendSystemMessage(Component.literal("[Polarity: " + polarity + "] - Fade time ticks - " + transitionTime).withStyle(ChatFormatting.RED));
-        player.sendSystemMessage(Component.literal("Marked at " + markTime + " - fade to " + calc).withStyle(ChatFormatting.RED));
+        if(transitionTime <= 2) instant(polarity);
+        else {
+            fadeToBlack = polarity;
+            markTime = ClientEvents.ClientForgeEvents.tick;
+            fadeTime = transitionTime;
 
+            int calc = markTime + fadeTime;
+            Player player = Minecraft.getInstance().player;
+            player.sendSystemMessage(Component.literal("[Polarity: " + polarity + "] - Fade time ticks - " + transitionTime).withStyle(ChatFormatting.RED));
+            player.sendSystemMessage(Component.literal("Marked at " + markTime + " - fade to " + calc).withStyle(ChatFormatting.RED));
+        }
+
+
+    }
+    private static void instant(boolean polarity){
+        if(polarity) alpha = 1;
+        else alpha = 0;
     }
 
 }
