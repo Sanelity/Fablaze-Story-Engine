@@ -1,9 +1,12 @@
 package lv.sanelite.initium.event;
 
 import lv.sanelite.initium.Initium;
+import lv.sanelite.initium.external.sequencer.Sequence;
 import lv.sanelite.initium.gui.BlackScreenHUD;
 import lv.sanelite.initium.util.KeyBinding;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
@@ -20,6 +23,10 @@ public class ClientEvents {
         public static void onKeyInput(InputEvent.Key event){
             if(KeyBinding.DEBUG_KEY.consumeClick()){
                 BlackScreenHUD.DEBUG = !BlackScreenHUD.DEBUG;
+            } else if (KeyBinding.ACT_KEY.consumeClick()) {
+                if(!Sequence.actions.isEmpty()){
+                    Sequence.actions.pop().play();
+                }
             }
         }
         @SubscribeEvent
@@ -28,6 +35,8 @@ public class ClientEvents {
                 tick++;
             }
         }
+
+
     }
     @Mod.EventBusSubscriber(modid = Initium.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientModBusEvents{

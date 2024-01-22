@@ -12,10 +12,11 @@ public class GlobalContext {
     public CameraFunction cam = new CameraFunction();
     public GUIFunction gui = new GUIFunction();
     public ParticleFunction particle = new ParticleFunction();
-    public PlayerFunction player = new PlayerFunction();
-    public SequenceFunction sequence = new SequenceFunction();
+    public PlayerFunction player;
+    public SceneFunction scene = new SceneFunction();
     public SoundFunction sound = new SoundFunction();
     public WorldFunction world = new WorldFunction();
+    public Sequence sequence = new Sequence();
 
     public Minecraft game = Minecraft.getInstance();
     public MinecraftServer server;
@@ -25,6 +26,7 @@ public class GlobalContext {
 
 
     public GlobalContext(ServerPlayer player, String scene){
+        this.player = new PlayerFunction(player);
         this.server = player.getServer();
         this.level = this.server.overworld().getLevel();
 

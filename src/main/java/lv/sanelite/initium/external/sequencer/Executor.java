@@ -22,6 +22,7 @@ public class Executor {
     public static void runScript(ServerPlayer player, String scene) throws IllegalAccessException {
         coreAPI = new GlobalContext(player, scene);
         loadAPI(coreAPI);
+        coreAPI.sequence.clear();
 
         try{
             ctx.evaluateString(scope, ScriptReader.readScript("act1"), null, 1, null);
