@@ -204,6 +204,7 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         } else if (player.isHolding(ModItems.DEL_TOOL.get())) {
             //Pososi y Fotoramki
             ActorFunction.eliminate(this);
+            //Ne sosi pg
             NPCMapper.deleteActorFromList(this.KEY);
         }
 
