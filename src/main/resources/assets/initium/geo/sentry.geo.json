@@ -123,6 +123,14 @@
 					]
 				},
 				{
+					"name": "downlashr",
+					"parent": "righteye",
+					"pivot": [-2, 27.5, -4],
+					"cubes": [
+						{"origin": [1, 24.1, -2.99], "size": [2, 1, 1], "inflate": 0, "uv": [19, 78]}
+					]
+				},
+				{
 					"name": "lefteye",
 					"parent": "emotes",
 					"pivot": [0, -4, 0],
@@ -152,6 +160,14 @@
 					"pivot": [-1.5, 26, -3.5],
 					"cubes": [
 						{"origin": [-2, 25, -3.98], "size": [1, 2, 1], "uv": [1, 81]}
+					]
+				},
+				{
+					"name": "downlashl",
+					"parent": "lefteye",
+					"pivot": [-2, 27.5, -4],
+					"cubes": [
+						{"origin": [-3, 24.1, -2.99], "size": [2, 1, 1], "inflate": 0, "uv": [7, 78]}
 					]
 				},
 				{

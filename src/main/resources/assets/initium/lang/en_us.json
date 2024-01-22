@@ -26,5 +26,8 @@
   "input.initium.actorname": "Name",
 
   "key.category.initium.base": "Initium: Tutorial mod",
-  "key.initium.cheat": "Cheat key"
+  "key.initium.cheat": "Cheat key",
+
+  "initium.target.notliving": "Only living entities able set to actor's sight"
+
 }
