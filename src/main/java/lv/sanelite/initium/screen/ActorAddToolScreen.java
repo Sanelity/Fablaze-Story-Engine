@@ -95,10 +95,45 @@ public class ActorAddToolScreen extends AbstractContainerScreen<ActorAddToolMenu
         this.addRenderableWidget(new Button(x - 37, y, 25, 20, Component.literal("<<"),button -> {if(step < 6) step += 1.20f;}));
     }
 
+    public MySliderComponent sliderButton;
+    private void rotMenu(){
+        int sliderWidth = 150;
+        int sliderHeight = 20;
+        int sliderX = (this.width - sliderWidth) / 2;
+        int sliderY = this.height / 2 + 50;
+        sliderButton = new MySliderComponent(sliderX, sliderY, sliderWidth, sliderHeight, Component.empty(), 0.5) {
+            @Override
+            public void applyValue() {
+                step = (float) (this.value - 0.5) * -8; // Значение от -1 до 1
+            }
+        };
+        this.addRenderableWidget(this.sliderButton);
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (button == 0) {
+            if (sliderButton.isMouseOver(mouseX, mouseY)) {
+                sliderButton.onClick(mouseX, mouseY);
+                return true;
+            }
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
+    }
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (button == 0 && this.sliderButton.isMouseOver(mouseX, mouseY)) {
+            this.sliderButton.setValueFromMouse(mouseX);
+            return true;
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
     @Override
     protected void init() {
         super.init();
         drawAddTool();
+        rotMenu();
 
     }
 
@@ -125,7 +160,7 @@ public class ActorAddToolScreen extends AbstractContainerScreen<ActorAddToolMenu
         renderBackground(pPoseStack);
         super.render(pPoseStack, mouseX, mouseY, delta);
         renderTooltip(pPoseStack, mouseX, mouseY);
-
+        this.rot += step * getMinecraft().getPartialTick();
         this.xMouse = (float)mouseX;
         this.yMouse = (float)mouseY;
     }
@@ -194,12 +229,9 @@ public class ActorAddToolScreen extends AbstractContainerScreen<ActorAddToolMenu
         return true;
     }
 
-
     @Override
     protected void containerTick() {
         super.containerTick();
-
-        this.rot += step;
         createButton.active = !keyBox.getValue().equals("");
 
 

@@ -1,7 +1,7 @@
 package lv.sanelite.initium.core;
 
-import lv.sanelite.initium.event.ClientEvents;
 import lv.sanelite.initium.external.sequencer.TimerThread;
+import net.minecraft.server.level.ServerLevel;
 
 public class SceneFunction {
 
@@ -33,5 +33,12 @@ public class SceneFunction {
             return (int)(unit.getTick() * multiplier);
         }
     }
+    public static void command(String minecraft_command, ServerLevel server){
+        server.getServer().getCommands().performPrefixedCommand(
+                server.getServer().createCommandSourceStack(),
+                minecraft_command
+        );
+    }
+
 
 }

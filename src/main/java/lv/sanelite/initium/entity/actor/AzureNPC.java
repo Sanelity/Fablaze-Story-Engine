@@ -92,13 +92,13 @@ public class AzureNPC extends PathfinderMob implements GeoEntity {
         controllers.add(look_animator);
     }
 
-        public static AttributeSupplier setAttributes (){
-        return AmbientCreature.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 20)
-                .add(Attributes.ATTACK_DAMAGE, 2.0f)
-                .add(Attributes.ATTACK_SPEED, 1.0f)
-                .add(Attributes.JUMP_STRENGTH, 1.0f)
-                .add(Attributes.MOVEMENT_SPEED, 0.28f).build();
+    public static AttributeSupplier setAttributes (){
+    return AmbientCreature.createMobAttributes()
+        .add(Attributes.MAX_HEALTH, 20)
+        .add(Attributes.ATTACK_DAMAGE, 2.0f)
+        .add(Attributes.ATTACK_SPEED, 1.0f)
+        .add(Attributes.JUMP_STRENGTH, 1.0f)
+        .add(Attributes.MOVEMENT_SPEED, 0.28f).build();
     }
     protected LookAtGoal look;
 
